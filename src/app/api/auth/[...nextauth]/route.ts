@@ -1,0 +1,76 @@
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import { db } from "@/db/drizzle";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { comparePassword } from "@/lib/password";
+
+const handler = NextAuth({
+  providers: [
+    Credentials({
+      name: "Credentials",
+
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email and password are required");
+        }
+
+        const user = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, credentials.email))
+          .limit(1);
+
+        if (user.length === 0) {
+          throw new Error("Invalid email or password");
+        }
+
+        const valid = await comparePassword(
+          credentials.password,
+          user[0].password
+        );
+
+        if (!valid) {
+          throw new Error("Invalid email or password");
+        }
+
+        return {
+          id: user[0].userId,
+          name: user[0].name,
+          email: user[0].email,
+        };
+      },
+    }),
+  ],
+
+  session: {
+    strategy: "jwt",
+  },
+
+  pages: {
+    signIn: "/",
+  },
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
+  },
+});
+
+export { handler as GET, handler as POST };
