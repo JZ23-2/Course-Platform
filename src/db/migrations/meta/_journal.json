@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1763535258171,
+      "tag": "0000_overrated_jasper_sitwell",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1763536471891,
+      "tag": "0001_aberrant_triton",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763536555361,
+      "tag": "0002_demonic_mister_fear",
+      "breakpoints": true
+    }
+  ]
+}
