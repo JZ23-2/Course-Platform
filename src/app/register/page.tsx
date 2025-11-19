@@ -1,48 +1,15 @@
 "use client";
-import { useTransition } from "react";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import Link from "next/link";
-import toast from "react-hot-toast";
-import { registerUser } from "@/actions/auth/auth-service";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function RegisterPage() {
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const form = new FormData(e.currentTarget);
-
-    const name = form.get("name") as string;
-    const email = form.get("email") as string;
-    const password = form.get("password") as string;
-    const confirm = form.get("confirm") as string;
-
-    if (password !== confirm) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
-    startTransition(async () => {
-      const res = await registerUser({ name, email, password });
-
-      if (res?.error) {
-        toast.error(res.error);
-        return;
-      }
-
-      if (res.success) {
-        toast.success(res.message);
-      }
-      router.push("/");
-    });
-  };
+  const { handleRegister, isPending } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative px-4">
@@ -66,7 +33,7 @@ export default function RegisterPage() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleRegister} className="space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Username</Label>
                 <Input
