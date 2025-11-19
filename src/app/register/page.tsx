@@ -1,18 +1,47 @@
 "use client";
-
-import { useState } from "react";
+import { useTransition } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import Link from "next/link";
+import toast from "react-hot-toast";
+import { registerUser } from "@/actions/auth/auth-service";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const form = new FormData(e.currentTarget);
+
+    const name = form.get("name") as string;
+    const email = form.get("email") as string;
+    const password = form.get("password") as string;
+    const confirm = form.get("confirm") as string;
+
+    if (password !== confirm) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    startTransition(async () => {
+      const res = await registerUser({ name, email, password });
+
+      if (res?.error) {
+        toast.error(res.error);
+        return;
+      }
+
+      if (res.success) {
+        toast.success(res.message);
+      }
+      router.push("/");
+    });
   };
 
   return (
@@ -42,6 +71,7 @@ export default function RegisterPage() {
                 <Label htmlFor="name">Username</Label>
                 <Input
                   id="name"
+                  name="name"
                   type="text"
                   placeholder="Input Your Username"
                   required
@@ -52,6 +82,7 @@ export default function RegisterPage() {
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="Input Your Email"
                   required
@@ -62,6 +93,7 @@ export default function RegisterPage() {
                 <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
                   placeholder="Input Your Password"
                   required
@@ -72,14 +104,15 @@ export default function RegisterPage() {
                 <Label htmlFor="confirm">Confirm Password</Label>
                 <Input
                   id="confirm"
+                  name="confirm"
                   type="password"
                   placeholder="Input Your Confirm Password"
                   required
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Creating account..." : "Sign Up"}
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? "Creating account..." : "Sign Up"}
               </Button>
             </form>
 
