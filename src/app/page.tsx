@@ -1,43 +1,15 @@
 "use client";
 
-import { useTransition } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import Link from "next/link";
-import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const form = new FormData(e.currentTarget);
-    const email = form.get("email") as string;
-    const password = form.get("password") as string;
-
-    startTransition(async () => {
-      const res = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
-      });
-
-      if (!res?.ok) {
-        toast.error(res?.error || "Login failed");
-        return;
-      }
-
-      toast.success("Login successful!");
-      router.push("/home");
-    });
-  };
+  const { handleLogin, isPending } = useAuth();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative px-4">
@@ -63,7 +35,7 @@ export default function LoginPage() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
