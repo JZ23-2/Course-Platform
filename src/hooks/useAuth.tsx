@@ -53,7 +53,7 @@ export function useAuth() {
       });
 
       if (!res?.ok) {
-        toast.error(res?.error || "Login failed");
+        toast.error("Login failed");
         return;
       }
 
