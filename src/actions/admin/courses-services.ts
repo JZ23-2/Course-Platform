@@ -3,9 +3,9 @@
 import { db } from "@/db/drizzle";
 import { courses } from "@/db/schema";
 import { actionResposneInterface } from "@/interface/action/action-response-interface";
-import { createCourseInterface } from "@/interface/admin/create-course-interface";
-import { GetCourseInterface } from "@/interface/admin/get-course-interface";
-import { updateCourseInterface } from "@/interface/admin/update-course-interface";
+import { createCourseInterface } from "@/interface/admin/courses/create-course-interface";
+import { GetCourseInterface } from "@/interface/admin/courses/get-course-interface";
+import { updateCourseInterface } from "@/interface/admin/courses/update-course-interface";
 import { eq } from "drizzle-orm";
 import slugify from "slugify";
 
@@ -39,6 +39,7 @@ export async function createCourseAction(
       slug: finalSlug,
       status: data.status,
       sortOrder: data.sortOrder,
+      type: data.type,
     });
 
     return { success: true, message: "Create course successfully!" };
@@ -75,7 +76,7 @@ export async function updateCourseAction(
   data: updateCourseInterface
 ): Promise<actionResposneInterface> {
   try {
-    const updates: any = {
+    const updates: updateCourseInterface = {
       updatedAt: new Date(),
     };
 
@@ -87,6 +88,7 @@ export async function updateCourseAction(
     if (data.thumbnail !== undefined) updates.thumbnail = data.thumbnail;
     if (data.status !== undefined) updates.status = data.status;
     if (data.sortOrder !== undefined) updates.sortOrder = data.sortOrder;
+    if (data.type !== undefined) updates.type = data.type;
 
     await db.update(courses).set(updates).where(eq(courses.courseId, id));
 
