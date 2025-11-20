@@ -12,7 +12,7 @@ export function ThemeToggle() {
       variant="outline"
       size="icon"
       onClick={toggleTheme}
-      className="absolute top-4 right-4"
+      className="relative"
     >
       {theme === "light" ? <Sun size={18} /> : <Moon size={18} />}
     </Button>
