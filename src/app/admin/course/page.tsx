@@ -5,15 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/ui/navbar";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -24,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Trash, Edit, Eye, Plus, Search, MoreHorizontal } from "lucide-react";
 import { motion } from "framer-motion";
-import { createCourseInterface } from "@/interface/admin/create-course-interface";
+import { createCourseInterface } from "@/interface/admin/courses/create-course-interface";
 import {
   createCourseAction,
   deleteCourseAction,
@@ -32,20 +24,25 @@ import {
   updateCourseAction,
 } from "@/actions/admin/courses-services";
 import toast from "react-hot-toast";
-import { GetCourseInterface } from "@/interface/admin/get-course-interface";
+import { GetCourseInterface } from "@/interface/admin/courses/get-course-interface";
+import DeleteModal from "@/components/ui/delete-modal";
+import { CourseModal } from "@/components/ui/courses/CourseModal";
 
 export default function AdminCoursesDashboard() {
   const router = useRouter();
   const [courses, setCourses] = useState<GetCourseInterface[]>([]);
   const [loading, setLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  const [editingCourse, setEditingCourse] = useState<any | null>(null);
+  const [editingCourse, setEditingCourse] = useState<GetCourseInterface | null>(
+    null
+  );
   const [formData, setFormData] = useState<createCourseInterface>({
     title: "",
     description: "",
     thumbnail: "",
     sortOrder: 0,
-    status: "",
+    status: "Draft",
+    type: "",
   });
   const [search, setSearch] = useState("");
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -75,14 +72,22 @@ export default function AdminCoursesDashboard() {
       description: "",
       thumbnail: "",
       sortOrder: 0,
-      status: "",
+      status: "Draft",
+      type: "Free",
     });
     setOpenDialog(true);
   };
 
-  const openEdit = (course: any) => {
+  const openEdit = (course: GetCourseInterface) => {
     setEditingCourse(course);
-    setFormData({ ...course });
+    setFormData({
+      title: course.title,
+      description: course.description ?? "",
+      thumbnail: course.thumbnail ?? "",
+      sortOrder: course.sortOrder ?? 0,
+      status: course.status ?? "Draft",
+      type: course.type ?? "Free",
+    });
     setOpenDialog(true);
   };
 
@@ -247,10 +252,14 @@ export default function AdminCoursesDashboard() {
                       </div>
 
                       <div className="flex flex-col items-end gap-2">
-                        <Badge>{course.status}</Badge>
-                        <div className="text-xs text-muted-foreground">
-                          3 modules
+                        <div className="flex flex-row gap-2">
+                          <Badge>{course.status}</Badge>
+                          <Badge>{course.type}</Badge>
                         </div>
+
+                        <span className="text-xs text-muted-foreground">
+                          3 modules
+                        </span>
                       </div>
                     </div>
                   </CardContent>
@@ -290,118 +299,25 @@ export default function AdminCoursesDashboard() {
             ))
           )}
         </div>
-
-        <div className="mt-8 flex items-center justify-center">
-          <Button variant="ghost">Load more</Button>
-        </div>
       </main>
 
-      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editingCourse ? "Edit Course" : "Create Course"}
-            </DialogTitle>
-          </DialogHeader>
+      <CourseModal
+        open={openDialog}
+        editingCourse={editingCourse}
+        formData={formData}
+        onClose={() => setOpenDialog(false)}
+        onConfirm={handleSave}
+        setFormData={setFormData}
+      />
 
-          <div className="space-y-4 py-2">
-            <Input
-              placeholder="Title"
-              value={formData.title}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  title: (e.target as HTMLInputElement).value,
-                })
-              }
-            />
-            <Textarea
-              placeholder="Short description"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  description: (e.target as HTMLTextAreaElement).value,
-                })
-              }
-            />
-            <Input
-              placeholder="Thumbnail URL (optional)"
-              value={formData.thumbnail}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  thumbnail: (e.target as HTMLInputElement).value,
-                })
-              }
-            />
-
-            <Input
-              type="number"
-              placeholder="Sort Order"
-              value={formData.sortOrder}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  sortOrder: Number(e.target.value),
-                })
-              }
-            />
-
-            <select
-              className="border rounded-md px-3 py-2 w-full"
-              value={formData.status}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  status: e.target.value,
-                })
-              }
-            >
-              <option value="Draft">Draft</option>
-              <option value="Published">Published</option>
-            </select>
-          </div>
-
-          <DialogFooter>
-            <div className="w-full flex justify-between items-center">
-              <div />
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setOpenDialog(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleSave}>
-                  {editingCourse ? "Update" : "Create"}
-                </Button>
-              </div>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={deleteDialog} onOpenChange={setDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Course</DialogTitle>
-          </DialogHeader>
-
-          <p className="text-sm text-muted-foreground">
-            Are you sure you want to delete{" "}
-            <span className="font-semibold">{courseToDelete?.title}</span>?{" "}
-            <br />
-            This action cannot be undone.
-          </p>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialog(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDeleteConfirmed}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteModal
+        open={deleteDialog}
+        title="Delete Course"
+        description="Are you sure you want to delete"
+        onClose={() => setDeleteDialog(false)}
+        itemName={courseToDelete?.title}
+        onConfirm={handleDeleteConfirmed}
+      />
     </div>
   );
 }
