@@ -6,7 +6,7 @@ export default withAuth(
     const { pathname } = req.nextUrl;
     const token = req.nextauth.token;
 
-    const protectedRoutes = ["/home", "/admin/:path*"];
+    const protectedRoutes = ["/home", "/admin"];
     if (!token && protectedRoutes.some((p) => pathname.startsWith(p))) {
       return NextResponse.redirect(new URL("/", req.url));
     }
