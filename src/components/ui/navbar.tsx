@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "./button";
+import { ThemeToggle } from "./theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,29 +31,37 @@ export default function Navbar() {
         </Link>
 
         {role === "admin" && (
-          <Link href="/admin" className="hover:text-primary transition-colors">
+          <Link
+            href="/admin/course"
+            className="hover:text-primary transition-colors"
+          >
             Admin
           </Link>
         )}
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="px-3 py-1 rounded">
-              {session?.user?.name || "Profile"}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem>
-              <Link href="/profile/edit">Edit Profile</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
-              Logout
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="px-3 py-1 rounded">
+                {session?.user?.name || "Profile"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem>
+                <Link href="/profile/edit">Edit Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <ThemeToggle />
+        </div>
       </div>
 
-      <div className="md:hidden">
+      <div className="md:hidden flex items-center gap-2">
+        <ThemeToggle />
+
         <Button
           variant="ghost"
           className="p-2"
@@ -73,7 +82,7 @@ export default function Navbar() {
 
             {role === "admin" && (
               <Link
-                href="/admin"
+                href="/admin/course"
                 className="px-4 py-2 hover:bg-muted/20 transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
