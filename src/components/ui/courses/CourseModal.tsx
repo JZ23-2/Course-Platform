@@ -28,76 +28,116 @@ export function CourseModal({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          <Input
-            placeholder="Title"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                title: (e.target as HTMLInputElement).value,
-              })
-            }
-          />
-          <Textarea
-            placeholder="Short description"
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                description: (e.target as HTMLTextAreaElement).value,
-              })
-            }
-          />
-          <Input
-            placeholder="Thumbnail URL (optional)"
-            value={formData.thumbnail}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                thumbnail: (e.target as HTMLInputElement).value,
-              })
-            }
-          />
+          <div className="space-y-1">
+            <label className="text-sm font-medium" htmlFor="title">
+              Title
+            </label>
+            <Input
+              id="title"
+              placeholder="Course title"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  title: e.target.value,
+                })
+              }
+            />
+          </div>
 
-          <Input
-            type="number"
-            placeholder="Sort Order"
-            value={formData.sortOrder}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                sortOrder: Number(e.target.value),
-              })
-            }
-          />
+          <div className="space-y-1">
+            <label className="text-sm font-medium" htmlFor="description">
+              Description
+            </label>
+            <Textarea
+              id="description"
+              placeholder="Short course description"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  description: e.target.value,
+                })
+              }
+            />
+          </div>
 
-          <select
-            className="border rounded-md px-3 py-2 w-full"
-            value={formData.status}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                status: e.target.value,
-              })
-            }
-          >
-            <option value="Draft">Draft</option>
-            <option value="Published">Published</option>
-          </select>
+          <div className="space-y-1">
+            <label className="text-sm font-medium" htmlFor="thumbnail">
+              Thumbnail URL
+            </label>
+            <Input
+              id="thumbnail"
+              placeholder="https://jackson.jpg"
+              value={formData.thumbnail}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  thumbnail: e.target.value,
+                })
+              }
+            />
+          </div>
 
-          <select
-            className="border rounded-md px-3 py-2 w-full"
-            value={formData.type}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                type: e.target.value,
-              })
-            }
-          >
-            <option value="Free">Free</option>
-            <option value="Paid">Paid</option>
-          </select>
+          <div className="space-y-1">
+            <label className="text-sm font-medium" htmlFor="status">
+              Status
+            </label>
+            <select
+              id="status"
+              className="border rounded-md px-3 py-2 w-full"
+              value={formData.status}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  status: e.target.value,
+                })
+              }
+            >
+              <option value="Draft">Draft</option>
+              <option value="Published">Published</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium" htmlFor="type">
+              Type
+            </label>
+            <select
+              id="type"
+              className="border rounded-md px-3 py-2 w-full"
+              value={formData.type}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  type: e.target.value,
+                })
+              }
+            >
+              <option value="Free">Free</option>
+              <option value="Paid">Paid</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium" htmlFor="sortOrder">
+              Sort Order
+            </label>
+            <Input
+              id="sortOrder"
+              type="number"
+              value={formData.sortOrder}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  sortOrder: Number(e.target.value),
+                })
+              }
+            />
+            <p className="text-xs text-muted-foreground">
+              Lower numbers appear first in lists.
+            </p>
+          </div>
         </div>
 
         <DialogFooter>
