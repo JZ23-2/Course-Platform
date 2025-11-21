@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useState } from "react";
+import React, { use } from "react";
 import Navbar from "@/components/ui/navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,18 +20,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Plus, Edit, Trash } from "lucide-react";
-import toast from "react-hot-toast";
-import { getChapterInterface } from "@/interface/admin/chapters/get-chapter-interface";
 import DeleteModal from "@/components/ui/delete-modal";
-import {
-  createLessonsAction,
-  deleteLessonAction,
-  updateLessonsAction,
-} from "@/actions/admin/lessons-service";
-import { createLessonsInterface } from "@/interface/admin/lessons/create-lesson-interface";
-import { LessonInterface } from "@/interface/admin/lessons/lesson-interface";
 import { useAdminChapters } from "@/hooks/useAdminChapters";
 import { useAdminCourses } from "@/hooks/useAdminCourses";
+import { useAdminLesson } from "@/hooks/useAdminLesson";
+import { LessonModal } from "@/components/ui/lessons/LessonModal";
 
 export default function CourseDetailPage({
   params,
@@ -39,24 +32,6 @@ export default function CourseDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
-
-  const [openLessonModal, setOpenLessonModal] = useState(false);
-  const [editingLesson, setEditingLesson] = useState<LessonInterface | null>(
-    null
-  );
-  const [lessonForm, setLessonForm] = useState<createLessonsInterface>({
-    title: "",
-    type: "video",
-    videoUrl: "",
-    description: "",
-    content: "",
-    sortOrder: 0,
-  });
-
-  const [deleteLessonsDialog, setDeleteLessonDialog] = useState(false);
-  const [lessonToDelete, setLessonToDelete] = useState<LessonInterface | null>(
-    null
-  );
 
   const { courseDetail } = useAdminCourses({ slug });
 
@@ -80,76 +55,26 @@ export default function CourseDetailPage({
     chapterToDelete,
   } = useAdminChapters({ courseDetail });
 
-  const confirmLessonDelete = (lesson: LessonInterface) => {
-    setLessonToDelete(lesson);
-    setDeleteLessonDialog(true);
-  };
-
-  const handleAddLesson = (chapter: getChapterInterface) => {
-    setActiveChapter(chapter.chapterId);
-    setEditingLesson(null);
-    setLessonForm({
-      title: "",
-      type: "video",
-      videoUrl: "",
-      description: "",
-      content: "",
-      sortOrder: 0,
-    });
-    setOpenLessonModal(true);
-  };
-
-  const handleEditLesson = (lesson: LessonInterface) => {
-    setEditingLesson(lesson);
-    setLessonForm({
-      title: lesson.title || "",
-      type: lesson.type || "",
-      videoUrl: lesson.videoUrl || "",
-      description: lesson.description || "",
-      content: lesson.content || "",
-      sortOrder: lesson.sortOrder || 0,
-    });
-    setOpenLessonModal(true);
-  };
-
-  const saveLesson = async () => {
-    if (editingLesson) {
-      const res = await updateLessonsAction(editingLesson.lessonId, lessonForm);
-
-      if (res.success) {
-        toast.success(res.message);
-        if (!courseDetail) return;
-        fetchChaptersDetail();
-      } else {
-        toast.error(res.message);
-      }
-    } else {
-      const res = await createLessonsAction(lessonForm, activeChapter);
-
-      if (res.success) {
-        toast.success(res.message);
-        if (!courseDetail) return;
-        fetchChaptersDetail();
-      } else {
-        toast.error(res.message);
-      }
-    }
-    setOpenLessonModal(false);
-  };
-
-  const deleteLesson = async () => {
-    if (!lessonToDelete) return;
-    const res = await deleteLessonAction(lessonToDelete.lessonId);
-    if (!courseDetail) return;
-    if (res.success) {
-      toast.success(res.message);
-    } else {
-      toast.error(res.message);
-    }
-    setDeleteLessonDialog(false);
-    setLessonToDelete(null);
-    fetchChaptersDetail();
-  };
+  const {
+    confirmLessonDelete,
+    deleteLesson,
+    deleteLessonsDialog,
+    editingLesson,
+    handleAddLesson,
+    handleEditLesson,
+    lessonForm,
+    lessonToDelete,
+    openLessonModal,
+    saveLesson,
+    setDeleteLessonDialog,
+    setLessonForm,
+    setOpenLessonModal,
+  } = useAdminLesson({
+    courseDetail,
+    fetchChaptersDetail,
+    activeChapter,
+    setActiveChapter,
+  });
 
   if (!courseDetail) return <div>Loading...</div>;
   return (
@@ -338,80 +263,14 @@ export default function CourseDetailPage({
         </DialogContent>
       </Dialog>
 
-      <Dialog open={openLessonModal} onOpenChange={setOpenLessonModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editingLesson ? "Edit Lesson" : "Add Lesson"}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <Input
-              placeholder="Lesson Title"
-              value={lessonForm.title}
-              onChange={(e) =>
-                setLessonForm({ ...lessonForm, title: e.target.value })
-              }
-            />
-
-            <Textarea
-              placeholder="Description"
-              value={lessonForm.description}
-              onChange={(e) =>
-                setLessonForm({ ...lessonForm, description: e.target.value })
-              }
-            />
-
-            <Input
-              type="number"
-              placeholder="Sort Order"
-              value={lessonForm.sortOrder}
-              onChange={(e) =>
-                setLessonForm({
-                  ...lessonForm,
-                  sortOrder: Number(e.target.value),
-                })
-              }
-            />
-
-            <select
-              className="border rounded-md px-3 py-2 w-full"
-              value={lessonForm.type}
-              onChange={(e) =>
-                setLessonForm({ ...lessonForm, type: e.target.value })
-              }
-            >
-              <option value="video">Video</option>
-              <option value="article">Article</option>
-            </select>
-
-            {lessonForm.type === "video" && (
-              <Input
-                placeholder="Video URL"
-                value={lessonForm.videoUrl}
-                onChange={(e) =>
-                  setLessonForm({ ...lessonForm, videoUrl: e.target.value })
-                }
-              />
-            )}
-
-            {lessonForm.type === "article" && (
-              <Textarea
-                placeholder="Content"
-                value={lessonForm.content}
-                onChange={(e) =>
-                  setLessonForm({ ...lessonForm, content: e.target.value })
-                }
-              />
-            )}
-          </div>
-
-          <DialogFooter>
-            <Button onClick={saveLesson}>Save</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <LessonModal
+        editingLesson={editingLesson}
+        lessonForm={lessonForm}
+        openLessonModal={openLessonModal}
+        saveLesson={saveLesson}
+        setLessonForm={setLessonForm}
+        setOpenLessonModal={setOpenLessonModal}
+      />
 
       <DeleteModal
         open={deleteDialog}
