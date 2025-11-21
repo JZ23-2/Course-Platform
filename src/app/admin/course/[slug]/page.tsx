@@ -4,15 +4,6 @@ import Navbar from "@/components/ui/navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
@@ -25,6 +16,7 @@ import { useAdminChapters } from "@/hooks/useAdminChapters";
 import { useAdminCourses } from "@/hooks/useAdminCourses";
 import { useAdminLesson } from "@/hooks/useAdminLesson";
 import { LessonModal } from "@/components/ui/lessons/LessonModal";
+import { ChapterModal } from "@/components/ui/chapters/ChapterModal";
 
 export default function CourseDetailPage({
   params,
@@ -219,49 +211,14 @@ export default function CourseDetailPage({
         </div>
       </div>
 
-      <Dialog open={openChapterModal} onOpenChange={setOpenChapterModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editingChapter ? "Edit Chapter" : "Add Chapter"}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <Input
-              placeholder="Chapter Title"
-              value={chapterForm.title}
-              onChange={(e) =>
-                setChapterForm({ ...chapterForm, title: e.target.value })
-              }
-            />
-
-            <Textarea
-              placeholder="Description"
-              value={chapterForm.description}
-              onChange={(e) =>
-                setChapterForm({ ...chapterForm, description: e.target.value })
-              }
-            />
-
-            <Input
-              id="sortOrder"
-              type="number"
-              value={chapterForm.sortOrder}
-              onChange={(e) =>
-                setChapterForm({
-                  ...chapterForm,
-                  sortOrder: Number(e.target.value),
-                })
-              }
-            />
-          </div>
-
-          <DialogFooter>
-            <Button onClick={saveChapter}>Save</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ChapterModal
+        chapterForm={chapterForm}
+        editingChapter={editingChapter}
+        openChapterModal={openChapterModal}
+        saveChapter={saveChapter}
+        setChapterForm={setChapterForm}
+        setOpenChapterModal={setOpenChapterModal}
+      />
 
       <LessonModal
         editingLesson={editingLesson}
