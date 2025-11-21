@@ -11,7 +11,10 @@ export const chapters = pgTable("chapters", {
   chapterId: text("chapterId").primaryKey(),
   courseId: text("courseId")
     .notNull()
-    .references(() => courses.courseId),
+    .references(() => courses.courseId, {
+      onUpdate: "cascade",
+      onDelete: "cascade",
+    }),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   sortOrder: integer("sortOrder").default(0),
