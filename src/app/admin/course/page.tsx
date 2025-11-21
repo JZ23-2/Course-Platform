@@ -7,7 +7,6 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -97,22 +96,18 @@ export default function AdminCoursesDashboard() {
                 <Card className="overflow-hidden shadow-lg hover:shadow-2xl transition-shadow">
                   <div className="relative h-44 bg-linear-to-br from-muted/60 to-muted/40 flex items-center justify-center">
                     {course.thumbnail ? (
-                      <Avatar>
-                        <AvatarImage
-                          src={course.thumbnail}
-                          alt={course.title}
-                        />
-                        <AvatarFallback>
-                          {course.title.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <img
+                        src={course.thumbnail}
+                        alt={course.title}
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       <div className="p-6 text-center">
                         <div className="text-lg font-semibold">
                           {course.title}
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">
-                          No cover image
+                          No thumbnail
                         </div>
                       </div>
                     )}
@@ -131,7 +126,7 @@ export default function AdminCoursesDashboard() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
                             onClick={() =>
-                              router.push(`/admin/courses/${course.courseId}`)
+                              router.push(`/admin/course/${course.slug}`)
                             }
                           >
                             <Eye size={14} className="mr-2" /> View
@@ -180,7 +175,7 @@ export default function AdminCoursesDashboard() {
                           variant="ghost"
                           size="sm"
                           onClick={() =>
-                            router.push(`/admin/courses/${course.courseId}`)
+                            router.push(`/admin/course/${course.slug}`)
                           }
                         >
                           <Eye size={14} /> View
