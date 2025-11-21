@@ -10,7 +10,7 @@ import { adminChapterProps } from "@/props/hooks/admin-chapter-props";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export function useAdminChapters({ course }: adminChapterProps) {
+export function useAdminChapters({ courseDetail }: adminChapterProps) {
   const [chapters, setChapters] = useState<getChapterInterface[]>([]);
   const [openChapterModal, setOpenChapterModal] = useState<boolean>(false);
   const [editingChapter, setEditingChapter] =
@@ -27,15 +27,15 @@ export function useAdminChapters({ course }: adminChapterProps) {
     useState<getChapterInterface | null>(null);
 
   const fetchChaptersDetail = async () => {
-    if (course) {
-      const res = await getChaptersWithLessons(course?.courseId);
+    if (courseDetail) {
+      const res = await getChaptersWithLessons(courseDetail?.courseId);
       setChapters(res);
     }
   };
 
   useEffect(() => {
     fetchChaptersDetail();
-  }, [course]);
+  }, [courseDetail]);
 
   const handleAddChapter = () => {
     setEditingChapter(null);
@@ -67,8 +67,11 @@ export function useAdminChapters({ course }: adminChapterProps) {
         toast.error(res.message);
       }
     } else {
-      if (course) {
-        const res = await createChapterAction(chapterForm, course.courseId);
+      if (courseDetail) {
+        const res = await createChapterAction(
+          chapterForm,
+          courseDetail.courseId
+        );
 
         if (res.success) {
           toast.success(res.message);
@@ -89,7 +92,7 @@ export function useAdminChapters({ course }: adminChapterProps) {
   const deleteChapter = async () => {
     if (!chapterToDelete) return;
     const res = await deleteChapterAction(chapterToDelete?.chapterId);
-    if (!course) return;
+    if (!courseDetail) return;
     if (res.success) {
       toast.success(res.message);
     } else {
@@ -97,7 +100,7 @@ export function useAdminChapters({ course }: adminChapterProps) {
     }
     setDeleteDialog(false);
     setChapterToDelete(null);
-    const chapterRes = await getChaptersWithLessons(course.courseId);
+    const chapterRes = await getChaptersWithLessons(courseDetail.courseId);
     setChapters(chapterRes);
   };
 
