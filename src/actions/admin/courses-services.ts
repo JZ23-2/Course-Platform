@@ -42,7 +42,7 @@ export async function createCourseAction(
       type: data.type,
     });
 
-    return { success: true, message: "Create course successfully!" };
+    return { success: true, message: "Create course success!" };
   } catch (err) {
     return {
       success: false,
@@ -71,6 +71,23 @@ export async function getAllCoursesAction(
   }
 }
 
+export async function getCourseAction(
+  slug: string
+): Promise<GetCourseInterface | null> {
+  try {
+    if (!slug) return null;
+
+    const course = await db.query.courses.findFirst({
+      where: (c, { ilike }) => ilike(c.slug, `%${slug}%`),
+    });
+
+    return course ?? null;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
 export async function updateCourseAction(
   id: string,
   data: updateCourseInterface
@@ -92,7 +109,7 @@ export async function updateCourseAction(
 
     await db.update(courses).set(updates).where(eq(courses.courseId, id));
 
-    return { success: true, message: "Update course successfully!" };
+    return { success: true, message: "Update course success!" };
   } catch (err) {
     return {
       success: false,
@@ -106,7 +123,7 @@ export async function deleteCourseAction(
 ): Promise<actionResposneInterface> {
   try {
     await db.delete(courses).where(eq(courses.courseId, id));
-    return { success: true, message: "Delete course successfully!" };
+    return { success: true, message: "Delete course success!" };
   } catch (err) {
     return {
       success: false,
