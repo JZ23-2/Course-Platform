@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect, useState } from "react";
+import React, { use, useState } from "react";
 import Navbar from "@/components/ui/navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,8 +20,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Plus, Edit, Trash } from "lucide-react";
-import { GetCourseInterface } from "@/interface/admin/courses/get-course-interface";
-import { getCourseAction } from "@/actions/admin/courses-services";
 import toast from "react-hot-toast";
 import { getChapterInterface } from "@/interface/admin/chapters/get-chapter-interface";
 import DeleteModal from "@/components/ui/delete-modal";
@@ -33,6 +31,7 @@ import {
 import { createLessonsInterface } from "@/interface/admin/lessons/create-lesson-interface";
 import { LessonInterface } from "@/interface/admin/lessons/lesson-interface";
 import { useAdminChapters } from "@/hooks/useAdminChapters";
+import { useAdminCourses } from "@/hooks/useAdminCourses";
 
 export default function CourseDetailPage({
   params,
@@ -40,7 +39,6 @@ export default function CourseDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
-  const [course, setCourse] = useState<GetCourseInterface | null>(null);
 
   const [openLessonModal, setOpenLessonModal] = useState(false);
   const [editingLesson, setEditingLesson] = useState<LessonInterface | null>(
@@ -60,15 +58,7 @@ export default function CourseDetailPage({
     null
   );
 
-  useEffect(() => {
-    const getCourseDetail = async () => {
-      const res = await getCourseAction(slug);
-
-      setCourse(res);
-    };
-
-    getCourseDetail();
-  }, [slug]);
+  const { courseDetail } = useAdminCourses({ slug });
 
   const {
     fetchChaptersDetail,
@@ -88,7 +78,7 @@ export default function CourseDetailPage({
     setDeleteDialog,
     setOpenChapterModal,
     chapterToDelete,
-  } = useAdminChapters({ course });
+  } = useAdminChapters({ courseDetail });
 
   const confirmLessonDelete = (lesson: LessonInterface) => {
     setLessonToDelete(lesson);
@@ -128,7 +118,7 @@ export default function CourseDetailPage({
 
       if (res.success) {
         toast.success(res.message);
-        if (!course) return;
+        if (!courseDetail) return;
         fetchChaptersDetail();
       } else {
         toast.error(res.message);
@@ -138,7 +128,7 @@ export default function CourseDetailPage({
 
       if (res.success) {
         toast.success(res.message);
-        if (!course) return;
+        if (!courseDetail) return;
         fetchChaptersDetail();
       } else {
         toast.error(res.message);
@@ -150,7 +140,7 @@ export default function CourseDetailPage({
   const deleteLesson = async () => {
     if (!lessonToDelete) return;
     const res = await deleteLessonAction(lessonToDelete.lessonId);
-    if (!course) return;
+    if (!courseDetail) return;
     if (res.success) {
       toast.success(res.message);
     } else {
@@ -161,7 +151,7 @@ export default function CourseDetailPage({
     fetchChaptersDetail();
   };
 
-  if (!course) return <div>Loading...</div>;
+  if (!courseDetail) return <div>Loading...</div>;
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -169,18 +159,20 @@ export default function CourseDetailPage({
       <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           <div className="space-y-6">
-            <h1 className="text-3xl font-bold">{course.title}</h1>
+            <h1 className="text-3xl font-bold">{courseDetail.title}</h1>
             <div className="flex gap-3">
-              <Badge>{course.status}</Badge>
-              <Badge variant="secondary">{course.type}</Badge>
+              <Badge>{courseDetail.status}</Badge>
+              <Badge variant="secondary">{courseDetail.type}</Badge>
             </div>
 
             <Card>
               <CardContent className="p-6 space-y-4">
                 <h2 className="text-xl font-semibold">Description</h2>
-                <p className="text-muted-foreground">{course.description}</p>
+                <p className="text-muted-foreground">
+                  {courseDetail.description}
+                </p>
                 <img
-                  src={course.thumbnail || ""}
+                  src={courseDetail.thumbnail || ""}
                   className="rounded-lg shadow-md w-full"
                 />
               </CardContent>
