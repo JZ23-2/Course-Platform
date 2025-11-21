@@ -22,13 +22,6 @@ import {
 import { Plus, Edit, Trash } from "lucide-react";
 import { GetCourseInterface } from "@/interface/admin/courses/get-course-interface";
 import { getCourseAction } from "@/actions/admin/courses-services";
-import {
-  createChapterAction,
-  deleteChapterAction,
-  getChaptersWithLessons,
-  updateChapterAction,
-} from "@/actions/admin/chapters-services";
-import { createChapterInterface } from "@/interface/admin/chapters/create-chapter-interface";
 import toast from "react-hot-toast";
 import { getChapterInterface } from "@/interface/admin/chapters/get-chapter-interface";
 import DeleteModal from "@/components/ui/delete-modal";
@@ -39,6 +32,7 @@ import {
 } from "@/actions/admin/lessons-service";
 import { createLessonsInterface } from "@/interface/admin/lessons/create-lesson-interface";
 import { LessonInterface } from "@/interface/admin/lessons/lesson-interface";
+import { useAdminChapters } from "@/hooks/useAdminChapters";
 
 export default function CourseDetailPage({
   params,
@@ -46,23 +40,12 @@ export default function CourseDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
-  const [chapters, setChapters] = useState<getChapterInterface[]>([]);
   const [course, setCourse] = useState<GetCourseInterface | null>(null);
-
-  const [openChapterModal, setOpenChapterModal] = useState<boolean>(false);
-  const [editingChapter, setEditingChapter] =
-    useState<getChapterInterface | null>(null);
-  const [chapterForm, setChapterForm] = useState<createChapterInterface>({
-    title: "",
-    description: "",
-    sortOrder: 0,
-  });
 
   const [openLessonModal, setOpenLessonModal] = useState(false);
   const [editingLesson, setEditingLesson] = useState<LessonInterface | null>(
     null
   );
-  const [activeChapter, setActiveChapter] = useState<string>("");
   const [lessonForm, setLessonForm] = useState<createLessonsInterface>({
     title: "",
     type: "video",
@@ -72,9 +55,6 @@ export default function CourseDetailPage({
     sortOrder: 0,
   });
 
-  const [deleteDialog, setDeleteDialog] = useState(false);
-  const [chapterToDelete, setChapterToDelete] =
-    useState<getChapterInterface | null>(null);
   const [deleteLessonsDialog, setDeleteLessonDialog] = useState(false);
   const [lessonToDelete, setLessonToDelete] = useState<LessonInterface | null>(
     null
@@ -90,87 +70,29 @@ export default function CourseDetailPage({
     getCourseDetail();
   }, [slug]);
 
-  useEffect(() => {
-    const fetchChaptersDetail = async () => {
-      if (course) {
-        const res = await getChaptersWithLessons(course?.courseId);
-
-        setChapters(res);
-      }
-    };
-    fetchChaptersDetail();
-  }, [course]);
-
-  const handleAddChapter = () => {
-    setEditingChapter(null);
-    setChapterForm({ title: "", description: "", sortOrder: 0 });
-    setOpenChapterModal(true);
-  };
-
-  const handleEditChapter = (chapter: getChapterInterface) => {
-    setEditingChapter(chapter);
-    setChapterForm({
-      title: chapter.title,
-      description: chapter.description || "",
-      sortOrder: chapter.sortOrder || 0,
-    });
-    setOpenChapterModal(true);
-  };
-
-  const saveChapter = async () => {
-    if (!course) return;
-    if (editingChapter) {
-      const res = await updateChapterAction(
-        editingChapter.chapterId,
-        chapterForm
-      );
-
-      if (res.success) {
-        toast.success(res.message);
-        const chapterRes = await getChaptersWithLessons(course.courseId);
-        setChapters(chapterRes);
-      } else {
-        toast.error(res.message);
-      }
-    } else {
-      if (course) {
-        const res = await createChapterAction(chapterForm, course.courseId);
-
-        if (res.success) {
-          toast.success(res.message);
-          const chapterRes = await getChaptersWithLessons(course.courseId);
-          setChapters(chapterRes);
-        } else {
-          toast.error(res.message);
-        }
-      }
-    }
-    setOpenChapterModal(false);
-  };
-
-  const confirmDelete = (chapter: getChapterInterface) => {
-    setChapterToDelete(chapter);
-    setDeleteDialog(true);
-  };
+  const {
+    fetchChaptersDetail,
+    activeChapter,
+    setActiveChapter,
+    chapters,
+    confirmDelete,
+    handleAddChapter,
+    handleEditChapter,
+    chapterForm,
+    deleteChapter,
+    deleteDialog,
+    editingChapter,
+    openChapterModal,
+    saveChapter,
+    setChapterForm,
+    setDeleteDialog,
+    setOpenChapterModal,
+    chapterToDelete,
+  } = useAdminChapters({ course });
 
   const confirmLessonDelete = (lesson: LessonInterface) => {
     setLessonToDelete(lesson);
     setDeleteLessonDialog(true);
-  };
-
-  const deleteChapter = async () => {
-    if (!chapterToDelete) return;
-    const res = await deleteChapterAction(chapterToDelete?.chapterId);
-    if (!course) return;
-    if (res.success) {
-      toast.success(res.message);
-    } else {
-      toast.error(res.message);
-    }
-    setDeleteDialog(false);
-    setChapterToDelete(null);
-    const chapterRes = await getChaptersWithLessons(course.courseId);
-    setChapters(chapterRes);
   };
 
   const handleAddLesson = (chapter: getChapterInterface) => {
@@ -207,8 +129,7 @@ export default function CourseDetailPage({
       if (res.success) {
         toast.success(res.message);
         if (!course) return;
-        const chapterRes = await getChaptersWithLessons(course.courseId);
-        setChapters(chapterRes);
+        fetchChaptersDetail();
       } else {
         toast.error(res.message);
       }
@@ -218,8 +139,7 @@ export default function CourseDetailPage({
       if (res.success) {
         toast.success(res.message);
         if (!course) return;
-        const chapterRes = await getChaptersWithLessons(course.courseId);
-        setChapters(chapterRes);
+        fetchChaptersDetail();
       } else {
         toast.error(res.message);
       }
@@ -238,8 +158,7 @@ export default function CourseDetailPage({
     }
     setDeleteLessonDialog(false);
     setLessonToDelete(null);
-    const chapterRes = await getChaptersWithLessons(course.courseId);
-    setChapters(chapterRes);
+    fetchChaptersDetail();
   };
 
   if (!course) return <div>Loading...</div>;
