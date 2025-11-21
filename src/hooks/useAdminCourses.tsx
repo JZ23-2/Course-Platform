@@ -11,7 +11,7 @@ import { adminCourseProps } from "@/props/hooks/admin-course-props";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export function useAdminCourses({ slug }: adminCourseProps) {
+export function useAdminCourses({ slug }: adminCourseProps = {}) {
   const [courses, setCourses] = useState<GetCourseInterface[]>([]);
   const [courseDetail, setCourseDetail] = useState<GetCourseInterface | null>(
     null
