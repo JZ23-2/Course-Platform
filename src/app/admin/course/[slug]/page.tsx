@@ -74,15 +74,15 @@ export default function CourseDetailPage({
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+          <div className="flex flex-col h-full space-y-6">
             <h1 className="text-3xl font-bold">{courseDetail.title}</h1>
             <div className="flex gap-3">
               <Badge>{courseDetail.status}</Badge>
               <Badge variant="secondary">{courseDetail.type}</Badge>
             </div>
 
-            <Card>
+            <Card className="h-full">
               <CardContent className="p-6 space-y-4">
                 <h2 className="text-xl font-semibold">Description</h2>
                 <p className="text-muted-foreground">
@@ -96,7 +96,7 @@ export default function CourseDetailPage({
             </Card>
           </div>
 
-          <div>
+          <div className="flex flex-col h-full">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold">Chapters</h3>
               <Button onClick={handleAddChapter} size="sm">
@@ -104,72 +104,95 @@ export default function CourseDetailPage({
               </Button>
             </div>
 
-            <Card>
+            <Card className="h-full">
               <CardContent className="p-4">
-                <Accordion type="single" collapsible>
-                  {chapters.map((chapter) => (
-                    <AccordionItem
-                      key={chapter.chapterId}
-                      value={chapter.chapterId}
-                    >
-                      <AccordionTrigger>
-                        <div className="flex flex-col w-full text-left">
-                          <span className="font-medium text-base">
-                            {chapter.title}
-                          </span>
-                          {chapter.description && (
-                            <span className="text-sm text-muted-foreground">
-                              {chapter.description}
+                {chapters.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No chapters added yet.
+                  </p>
+                ) : (
+                  <Accordion type="single" collapsible className="space-y-3">
+                    {chapters.map((chapter) => (
+                      <AccordionItem
+                        key={chapter.chapterId}
+                        value={chapter.chapterId}
+                        className="border border-border/50 rounded-xl shadow-sm bg-card"
+                      >
+                        <AccordionTrigger className="hover:no-underline py-4 px-2">
+                          <div className="flex flex-col w-full text-left">
+                            <span className="font-semibold text-lg flex items-center gap-2">
+                              {chapter.title}
                             </span>
-                          )}
-                        </div>
-                      </AccordionTrigger>
 
-                      <AccordionContent>
-                        <div className="pl-4 py-2">
-                          <div className="flex gap-2 mb-3">
+                            {chapter.description && (
+                              <span className="text-sm text-muted-foreground mt-1">
+                                {chapter.description}
+                              </span>
+                            )}
+                          </div>
+                        </AccordionTrigger>
+
+                        <AccordionContent className="px-4 pb-4 pt-2 space-y-4">
+                          <div className="flex gap-2">
                             <Button
                               variant="outline"
                               size="sm"
+                              className="rounded-lg"
                               onClick={() => handleEditChapter(chapter)}
                             >
-                              <Edit size={12} />
+                              <Edit size={14} className="mr-1" /> Edit
                             </Button>
+
                             <Button
                               variant="destructive"
                               size="sm"
+                              className="rounded-lg"
                               onClick={() => confirmDelete(chapter)}
                             >
-                              <Trash size={12} />
+                              <Trash size={14} className="mr-1" /> Delete
                             </Button>
+
                             <Button
                               size="sm"
+                              className="rounded-lg"
                               onClick={() => handleAddLesson(chapter)}
                             >
-                              <Plus size={12} className="mr-1" /> Add Lesson
+                              <Plus size={14} className="mr-1" /> Add Lesson
                             </Button>
                           </div>
+
+                          {(chapter.lessons?.length ?? 0) === 0 && (
+                            <p className="text-sm text-muted-foreground">
+                              No lessons in this chapter.
+                            </p>
+                          )}
 
                           {(chapter.lessons || []).map((lesson) => (
                             <div
                               key={lesson.lessonId}
-                              className="p-3 rounded-md bg-muted flex flex-col gap-2 mb-3"
+                              className="p-4 rounded-xl border bg-muted/50 backdrop-blur-sm shadow-sm flex flex-col gap-3"
                             >
                               <div className="flex justify-between items-center">
-                                <span className="font-medium">
-                                  {lesson.title}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-base">
+                                    {lesson.title}
+                                  </span>
+                                </div>
+
                                 <div className="flex gap-2">
                                   <Button
                                     variant="outline"
                                     size="sm"
+                                    className="rounded-lg"
                                     onClick={() => handleEditLesson(lesson)}
                                   >
                                     <Edit size={12} />
                                   </Button>
+
                                   <Button
                                     variant="destructive"
                                     size="sm"
+                                    className="rounded-lg"
                                     onClick={() => confirmLessonDelete(lesson)}
                                   >
                                     <Trash size={12} />
@@ -178,7 +201,7 @@ export default function CourseDetailPage({
                               </div>
 
                               {lesson.description && (
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-sm text-muted-foreground leading-relaxed">
                                   {lesson.description}
                                 </p>
                               )}
@@ -187,12 +210,13 @@ export default function CourseDetailPage({
                                 <video
                                   controls
                                   src={lesson.videoUrl}
-                                  className="w-full rounded-md"
+                                  className="w-full rounded-lg shadow-md"
                                 />
                               )}
+
                               {lesson.type === "article" && lesson.content && (
                                 <div
-                                  className="prose max-w-full"
+                                  className="prose prose-neutral max-w-full"
                                   dangerouslySetInnerHTML={{
                                     __html: lesson.content,
                                   }}
@@ -200,11 +224,11 @@ export default function CourseDetailPage({
                               )}
                             </div>
                           ))}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                )}
               </CardContent>
             </Card>
           </div>
