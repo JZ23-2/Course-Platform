@@ -162,7 +162,7 @@ export default function AdminCoursesDashboard() {
                         </div>
 
                         <span className="text-xs text-muted-foreground">
-                          3 modules
+                          {course.chapterCount} Chapters
                         </span>
                       </div>
                     </div>
