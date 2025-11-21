@@ -29,10 +29,6 @@ export function useAdminCourses() {
   const [courseToDelete, setCourseToDelete] =
     useState<GetCourseInterface | null>(null);
 
-  useEffect(() => {
-    loadCourses();
-  }, []);
-
   const loadCourses = async (q: string = "") => {
     setLoading(true);
     const test = await getAllCoursesAction(q);
@@ -131,6 +127,6 @@ export function useAdminCourses() {
     deleteDialog,
     setDeleteDialog,
     courseToDelete,
-    handleDeleteConfirmed
+    handleDeleteConfirmed,
   };
 }
