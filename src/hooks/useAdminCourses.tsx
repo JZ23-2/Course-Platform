@@ -7,12 +7,13 @@ import {
 } from "@/actions/admin/courses-services";
 import { createCourseInterface } from "@/interface/admin/courses/create-course-interface";
 import { GetCourseInterface } from "@/interface/admin/courses/get-course-interface";
+import { GetCourseWithCount } from "@/interface/admin/courses/get-course-with-count";
 import { adminCourseProps } from "@/props/hooks/admin-course-props";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export function useAdminCourses({ slug }: adminCourseProps = {}) {
-  const [courses, setCourses] = useState<GetCourseInterface[]>([]);
+  const [courses, setCourses] = useState<GetCourseWithCount[]>([]);
   const [courseDetail, setCourseDetail] = useState<GetCourseInterface | null>(
     null
   );
@@ -36,8 +37,8 @@ export function useAdminCourses({ slug }: adminCourseProps = {}) {
 
   const loadCourses = async (q: string = "") => {
     setLoading(true);
-    const test = await getAllCoursesAction(q);
-    setCourses(test);
+    const res = await getAllCoursesAction(q);
+    setCourses(res);
     setLoading(false);
   };
 
