@@ -1,22 +1,44 @@
-import { getUserRole } from "@/actions/user/user-service";
+"use client";
+
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { getUserData } from "@/actions/user/user-service";
+import { UserContextType } from "@/interface/user/user-context-interface";
 
-export function useUser() {
+const UserContext = createContext<UserContextType>({
+  name: null,
+  role: null,
+  fetchUserData: async () => {},
+});
+
+export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { data: session } = useSession();
-
+  const [name, setName] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
 
+  const fetchUserData = async () => {
+    if (!session?.user?.email) return;
+    const res = await getUserData(session.user.email);
+
+    setName(res[0].name);
+    setRole(res[0].role);
+  };
+
   useEffect(() => {
-    const fetchUserRole = async () => {
-      if (session) {
-        const res = await getUserRole(session?.user.email);
-        setRole(res[0].role);
-      }
-    };
+    fetchUserData();
+  }, [session?.user?.email]);
 
-    fetchUserRole();
-  }, [session]);
+  return (
+    <UserContext.Provider value={{ name, role, fetchUserData }}>
+      {children}
+    </UserContext.Provider>
+  );
+};
 
-  return { role };
-}
+export const useUser = () => useContext(UserContext);
