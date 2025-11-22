@@ -17,6 +17,8 @@ import { useAdminCourses } from "@/hooks/useAdminCourses";
 import { useAdminLesson } from "@/hooks/useAdminLesson";
 import { LessonModal } from "@/components/ui/lessons/LessonModal";
 import { ChapterModal } from "@/components/ui/chapters/ChapterModal";
+import { useCourses } from "@/hooks/useCourses";
+import { useChapters } from "@/hooks/useChapters";
 
 export default function CourseDetailPage({
   params,
@@ -25,13 +27,14 @@ export default function CourseDetailPage({
 }) {
   const { slug } = use(params);
 
-  const { courseDetail } = useAdminCourses({ slug });
+  const { courseDetail } = useCourses({ slug });
+  const { chapters, fetchChaptersDetail, setChapters } = useChapters({
+    courseDetail,
+  });
 
   const {
-    fetchChaptersDetail,
     activeChapter,
     setActiveChapter,
-    chapters,
     confirmDelete,
     handleAddChapter,
     handleEditChapter,
@@ -45,7 +48,12 @@ export default function CourseDetailPage({
     setDeleteDialog,
     setOpenChapterModal,
     chapterToDelete,
-  } = useAdminChapters({ courseDetail });
+  } = useAdminChapters({
+    courseDetail,
+    chapters,
+    fetchChaptersDetail,
+    setChapters,
+  });
 
   const {
     confirmLessonDelete,
