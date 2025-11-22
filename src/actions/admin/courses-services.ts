@@ -5,9 +5,8 @@ import { courses } from "@/db/schema";
 import { actionResposneInterface } from "@/interface/action/action-response-interface";
 import { createCourseInterface } from "@/interface/admin/courses/create-course-interface";
 import { GetCourseInterface } from "@/interface/admin/courses/get-course-interface";
-import { GetCourseWithCount } from "@/interface/admin/courses/get-course-with-count";
 import { updateCourseInterface } from "@/interface/admin/courses/update-course-interface";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import slugify from "slugify";
 
 export async function createCourseAction(
@@ -49,42 +48,6 @@ export async function createCourseAction(
       success: false,
       message: err instanceof Error ? err.message : "Unknown Error",
     };
-  }
-}
-
-export async function getAllCoursesAction(
-  search?: string
-): Promise<GetCourseWithCount[]> {
-  try {
-    const whereClause = search
-      ? (c: typeof courses, { ilike }: any) =>
-          ilike(c.title, `%${search}%`) || ilike(c.description, `%${search}%`)
-      : undefined;
-
-    const data = await db
-      .select({
-        courseId: courses.courseId,
-        slug: courses.slug,
-        title: courses.title,
-        description: courses.description,
-        thumbnail: courses.thumbnail,
-        status: courses.status,
-        type: courses.type,
-        sortOrder: courses.sortOrder,
-        createdAt: courses.createdAt,
-        updatedAt: courses.updatedAt,
-        chapterCount: sql<number>`
-          (SELECT COUNT(*) FROM chapters 
-            WHERE chapters."courseId" = ${courses.courseId})
-        `,
-      })
-      .from(courses)
-      .where(whereClause as any)
-      .orderBy(courses.sortOrder);
-
-    return data;
-  } catch (err) {
-    return [];
   }
 }
 
