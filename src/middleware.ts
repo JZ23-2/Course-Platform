@@ -16,6 +16,12 @@ export default withAuth(
       return NextResponse.redirect(new URL("/home", req.url));
     }
 
+    if (pathname.startsWith("/admin")) {
+      if (!token || token.role !== "admin") {
+        return NextResponse.redirect(new URL("/home", req.url));
+      }
+    }
+
     return NextResponse.next();
   },
   {
