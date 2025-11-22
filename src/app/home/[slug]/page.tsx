@@ -1,5 +1,6 @@
 "use client";
 import React, { use } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,8 @@ import {
 } from "@/components/ui/accordion";
 import { useChapters } from "@/hooks/useChapters";
 import { useCourses } from "@/hooks/useCourses";
+import { getUserSubscription } from "@/actions/subscriptions/subscriptions-service";
+import { useSession } from "next-auth/react";
 
 export default function CourseDetailPage({
   params,
@@ -18,15 +21,58 @@ export default function CourseDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
-
+  const { data: session } = useSession();
   const { courseDetail } = useCourses({ slug });
   const { chapters } = useChapters({ courseDetail });
+
+  const [allowed, setAllowed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    async function check() {
+      if (!courseDetail) return;
+
+      if (courseDetail.type !== "Paid") {
+        setAllowed(true);
+        return;
+      }
+
+      const ok = await getUserSubscription(session?.user.id || "");
+      setAllowed(ok);
+    }
+
+    check();
+  }, [courseDetail, session]);
+
+  if (!courseDetail) return <div>Loading...</div>;
+
+  if (allowed === null) return <div>Checking subscription...</div>;
+
+  if (!allowed)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="p-6 rounded-xl border shadow-md max-w-md text-center">
+          <h1 className="text-2xl font-semibold mb-2">Subscription Required</h1>
+          <p className="text-muted-foreground mb-4">
+            You must have an active subscription to access this course.
+          </p>
+          <a
+            href="/pricing"
+            className="
+    px-4 py-2 
+    rounded-lg 
+    bg-primary text-white 
+    dark:bg-white dark:text-black
+  "
+          >
+            View Plans
+          </a>
+        </div>
+      </div>
+    );
 
   if (!courseDetail) return <div>Loading...</div>;
 
   const courseChapters = chapters;
-
-  console.log(chapters);
 
   return (
     <div className="min-h-screen bg-background">
@@ -115,12 +161,7 @@ export default function CourseDetailPage({
                                 )}
                                 {lesson.type === "article" &&
                                   lesson.content && (
-                                    <div
-                                      className="prose prose-neutral max-w-full"
-                                      dangerouslySetInnerHTML={{
-                                        __html: lesson.content,
-                                      }}
-                                    />
+                                    <div className="prose prose-neutral max-w-full" />
                                   )}
                               </div>
                             ))
