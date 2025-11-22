@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { User as NextAuthUser } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { db } from "@/db/drizzle";
 import { users } from "@/db/schema";
@@ -15,7 +15,7 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
 
-      async authorize(credentials) {
+      async authorize(credentials): Promise<NextAuthUser | null> {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Email and password are required");
         }
@@ -44,7 +44,7 @@ const handler = NextAuth({
           name: user[0].name,
           email: user[0].email,
           role: user[0].role,
-        };
+        } as NextAuthUser;
       },
     }),
   ],
@@ -63,6 +63,7 @@ const handler = NextAuth({
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
+        token.role = user.role;
       }
       return token;
     },
