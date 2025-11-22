@@ -9,8 +9,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useAdminCourses } from "@/hooks/useAdminCourses";
-import { useAdminChapters } from "@/hooks/useAdminChapters";
+import { useChapters } from "@/hooks/useChapters";
+import { useCourses } from "@/hooks/useCourses";
 
 export default function CourseDetailPage({
   params,
@@ -19,14 +19,14 @@ export default function CourseDetailPage({
 }) {
   const { slug } = use(params);
 
-  const { courseDetail } = useAdminCourses({ slug });
-  const { chapters } = useAdminChapters({ courseDetail });
+  const { courseDetail } = useCourses({ slug });
+  const { chapters } = useChapters({ courseDetail });
 
   if (!courseDetail) return <div>Loading...</div>;
 
   const courseChapters = chapters;
 
-  console.log(chapters)
+  console.log(chapters);
 
   return (
     <div className="min-h-screen bg-background">
