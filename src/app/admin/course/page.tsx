@@ -18,16 +18,15 @@ import { motion } from "framer-motion";
 import DeleteModal from "@/components/ui/delete-modal";
 import { CourseModal } from "@/components/ui/courses/CourseModal";
 import { useAdminCourses } from "@/hooks/useAdminCourses";
+import { useCourses } from "@/hooks/useCourses";
 
 export default function AdminCoursesDashboard() {
   const router = useRouter();
 
+  const { courses, loadCourses, loading, search, setSearch } = useCourses();
+
   const {
-    search,
-    setSearch,
     openCreate,
-    loading,
-    courses,
     openEdit,
     confirmDelete,
     courseToDelete,
@@ -40,7 +39,7 @@ export default function AdminCoursesDashboard() {
     setDeleteDialog,
     setFormData,
     setOpenDialog,
-  } = useAdminCourses();
+  } = useAdminCourses({ loadCourses, search });
 
   return (
     <div className="min-h-screen bg-linear-to-b from-background/60 via-background to-background p-0">
