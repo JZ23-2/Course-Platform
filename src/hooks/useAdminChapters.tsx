@@ -1,18 +1,16 @@
 import {
   createChapterAction,
   deleteChapterAction,
-  getChaptersWithLessons,
   updateChapterAction,
 } from "@/actions/admin/chapters-services";
 import { createChapterInterface } from "@/interface/admin/chapters/create-chapter-interface";
 import { getChapterInterface } from "@/interface/admin/chapters/get-chapter-interface";
 import { adminChapterProps } from "@/props/hooks/admin-chapter-props";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 export function useAdminChapters({
   courseDetail,
-  chapters,
   fetchChaptersDetail,
   setChapters,
 }: adminChapterProps = {}) {
@@ -84,6 +82,7 @@ export function useAdminChapters({
   };
 
   const deleteChapter = async () => {
+    if (!fetchChaptersDetail) return;
     if (!setChapters) return;
     if (!chapterToDelete) return;
     const res = await deleteChapterAction(chapterToDelete?.chapterId);
@@ -95,8 +94,7 @@ export function useAdminChapters({
     }
     setDeleteDialog(false);
     setChapterToDelete(null);
-    const chapterRes = await getChaptersWithLessons(courseDetail.courseId);
-    setChapters(chapterRes);
+    fetchChaptersDetail();
   };
 
   return {
