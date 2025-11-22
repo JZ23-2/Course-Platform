@@ -27,69 +27,112 @@ export function LessonModal({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <Input
-            placeholder="Lesson Title"
-            value={lessonForm.title}
-            onChange={(e) =>
-              setLessonForm({ ...lessonForm, title: e.target.value })
-            }
-          />
-
-          <Textarea
-            placeholder="Description"
-            value={lessonForm.description}
-            onChange={(e) =>
-              setLessonForm({ ...lessonForm, description: e.target.value })
-            }
-          />
-
-          <Input
-            type="number"
-            placeholder="Sort Order"
-            value={lessonForm.sortOrder}
-            onChange={(e) =>
-              setLessonForm({
-                ...lessonForm,
-                sortOrder: Number(e.target.value),
-              })
-            }
-          />
-
-          <select
-            className="border rounded-md px-3 py-2 w-full"
-            value={lessonForm.type}
-            onChange={(e) =>
-              setLessonForm({ ...lessonForm, type: e.target.value })
-            }
-          >
-            <option value="video">Video</option>
-            <option value="article">Article</option>
-          </select>
-
-          {lessonForm.type === "video" && (
+        <div className="space-y-4 py-2">
+          <div className="space-y-1">
+            <label htmlFor="lessonTitle" className="text-sm font-medium">
+              Title
+            </label>
             <Input
-              placeholder="Video URL"
-              value={lessonForm.videoUrl}
+              id="lessonTitle"
+              placeholder="Lesson title"
+              value={lessonForm.title}
               onChange={(e) =>
-                setLessonForm({ ...lessonForm, videoUrl: e.target.value })
+                setLessonForm({ ...lessonForm, title: e.target.value })
               }
             />
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="lessonDescription" className="text-sm font-medium">
+              Description
+            </label>
+            <Textarea
+              id="lessonDescription"
+              placeholder="Lesson description"
+              value={lessonForm.description}
+              onChange={(e) =>
+                setLessonForm({ ...lessonForm, description: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="lessonType" className="text-sm font-medium">
+              Type
+            </label>
+            <select
+              id="lessonType"
+              className="border rounded-md px-3 py-2 w-full"
+              value={lessonForm.type}
+              onChange={(e) =>
+                setLessonForm({ ...lessonForm, type: e.target.value })
+              }
+            >
+              <option value="video">Video</option>
+              <option value="article">Article</option>
+            </select>
+          </div>
+
+          {lessonForm.type === "video" && (
+            <div className="space-y-1">
+              <label htmlFor="videoUrl" className="text-sm font-medium">
+                Video URL
+              </label>
+              <Input
+                id="videoUrl"
+                placeholder="https://video"
+                value={lessonForm.videoUrl}
+                onChange={(e) =>
+                  setLessonForm({ ...lessonForm, videoUrl: e.target.value })
+                }
+              />
+            </div>
           )}
 
           {lessonForm.type === "article" && (
-            <Textarea
-              placeholder="Content"
-              value={lessonForm.content}
+            <div className="space-y-1">
+              <label htmlFor="articleContent" className="text-sm font-medium">
+                Content
+              </label>
+              <Textarea
+                id="articleContent"
+                placeholder="Write your article"
+                value={lessonForm.content}
+                onChange={(e) =>
+                  setLessonForm({ ...lessonForm, content: e.target.value })
+                }
+              />
+            </div>
+          )}
+
+          <div className="space-y-1">
+            <label htmlFor="sortOrder" className="text-sm font-medium">
+              Sort Order
+            </label>
+            <Input
+              id="sortOrder"
+              type="number"
+              placeholder="Sort order"
+              value={lessonForm.sortOrder}
               onChange={(e) =>
-                setLessonForm({ ...lessonForm, content: e.target.value })
+                setLessonForm({
+                  ...lessonForm,
+                  sortOrder: Number(e.target.value),
+                })
               }
             />
-          )}
+            <p className="text-xs text-muted-foreground">
+              Lower numbers appear first in lists.
+            </p>
+          </div>
         </div>
 
         <DialogFooter>
-          <Button onClick={saveLesson}>Save</Button>
+          <div className="flex w-full justify-end">
+            <Button onClick={saveLesson}>
+              {editingLesson ? "Update" : "Save"}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
