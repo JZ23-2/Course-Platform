@@ -111,7 +111,7 @@ export default function HomePage() {
                       disabled={course.type === "Paid"}
                       onClick={() =>
                         course.type !== "Paid" &&
-                        router.push(`/course/${course.slug}`)
+                        router.push(`/home/${course.slug}`)
                       }
                     >
                       <Eye size={16} />
