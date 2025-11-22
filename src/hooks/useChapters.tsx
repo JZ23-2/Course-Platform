@@ -1,4 +1,4 @@
-import { getChaptersWithLessons } from "@/actions/admin/chapters-services";
+import { getChaptersWithLessons } from "@/actions/chapters/chapter-service";
 import { getChapterInterface } from "@/interface/admin/chapters/get-chapter-interface";
 import { chapterProps } from "@/props/hooks/chapter-props";
 import { useEffect, useState } from "react";
