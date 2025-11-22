@@ -7,10 +7,10 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Eye, Lock } from "lucide-react";
 import { motion } from "framer-motion";
-import { useAdminCourses } from "@/hooks/useAdminCourses";
+import { useCourses } from "@/hooks/useCourses";
 
 export default function HomePage() {
-  const { courses } = useAdminCourses();
+  const { courses } = useCourses();
   const router = useRouter();
 
   const visibleCourses = courses.filter((course) => course.status !== "Draft");
