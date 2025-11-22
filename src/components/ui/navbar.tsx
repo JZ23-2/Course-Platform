@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import { Button } from "./button";
 import { ThemeToggle } from "./theme-toggle";
 import {
@@ -15,9 +16,11 @@ import { Menu } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 
 export default function Navbar() {
-  const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
-  const { role } = useUser();
+  const { role, name } = useUser();
+  const pathname = usePathname();
+
+  const isActive = (path: string) => pathname === path;
 
   return (
     <nav className="w-full bg-background border-b border-border shadow-sm px-6 py-3 flex justify-between items-center relative">
@@ -26,14 +29,21 @@ export default function Navbar() {
       </Link>
 
       <div className="hidden md:flex items-center gap-4">
-        <Link href="/courses" className="hover:text-primary transition-colors">
+        <Link
+          href="/home"
+          className={`hover:text-primary transition-colors ${
+            isActive("/home") ? "text-primary font-semibold" : ""
+          }`}
+        >
           Courses
         </Link>
 
         {role === "admin" && (
           <Link
             href="/admin/course"
-            className="hover:text-primary transition-colors"
+            className={`hover:text-primary transition-colors ${
+              isActive("/admin/course") ? "text-primary font-semibold" : ""
+            }`}
           >
             Admin
           </Link>
@@ -43,12 +53,17 @@ export default function Navbar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="px-3 py-1 rounded">
-                {session?.user?.name || "Profile"}
+                {name || "Profile"}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem>
-                <Link href="/profile/edit">Edit Profile</Link>
+                <Link
+                  href="/user/profile"
+                  className={isActive("/user/profile") ? "font-semibold" : ""}
+                >
+                  Profile
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
                 Logout
@@ -61,7 +76,6 @@ export default function Navbar() {
 
       <div className="md:hidden flex items-center gap-2">
         <ThemeToggle />
-
         <Button
           variant="ghost"
           className="p-2"
@@ -73,8 +87,10 @@ export default function Navbar() {
         {menuOpen && (
           <div className="absolute top-full right-0 mt-2 w-48 bg-background border border-border rounded shadow-lg flex flex-col">
             <Link
-              href="/courses"
-              className="px-4 py-2 hover:bg-muted/20 transition-colors"
+              href="/home"
+              className={`px-4 py-2 hover:bg-muted/20 transition-colors ${
+                isActive("/home") ? "bg-muted/20 font-semibold" : ""
+              }`}
               onClick={() => setMenuOpen(false)}
             >
               Courses
@@ -83,7 +99,9 @@ export default function Navbar() {
             {role === "admin" && (
               <Link
                 href="/admin/course"
-                className="px-4 py-2 hover:bg-muted/20 transition-colors"
+                className={`px-4 py-2 hover:bg-muted/20 transition-colors ${
+                  isActive("/admin/course") ? "bg-muted/20 font-semibold" : ""
+                }`}
                 onClick={() => setMenuOpen(false)}
               >
                 Admin
@@ -91,11 +109,13 @@ export default function Navbar() {
             )}
 
             <Link
-              href="/profile/edit"
-              className="px-4 py-2 hover:bg-muted/20 transition-colors"
+              href="/user/profile"
+              className={`px-4 py-2 hover:bg-muted/20 transition-colors ${
+                isActive("/user/profile") ? "bg-muted/20 font-semibold" : ""
+              }`}
               onClick={() => setMenuOpen(false)}
             >
-              Edit Profile
+              Profile
             </Link>
 
             <button
