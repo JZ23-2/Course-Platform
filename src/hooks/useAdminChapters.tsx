@@ -10,8 +10,12 @@ import { adminChapterProps } from "@/props/hooks/admin-chapter-props";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export function useAdminChapters({ courseDetail }: adminChapterProps) {
-  const [chapters, setChapters] = useState<getChapterInterface[]>([]);
+export function useAdminChapters({
+  courseDetail,
+  chapters,
+  fetchChaptersDetail,
+  setChapters,
+}: adminChapterProps = {}) {
   const [openChapterModal, setOpenChapterModal] = useState<boolean>(false);
   const [editingChapter, setEditingChapter] =
     useState<getChapterInterface | null>(null);
@@ -25,17 +29,6 @@ export function useAdminChapters({ courseDetail }: adminChapterProps) {
 
   const [chapterToDelete, setChapterToDelete] =
     useState<getChapterInterface | null>(null);
-
-  const fetchChaptersDetail = async () => {
-    if (courseDetail) {
-      const res = await getChaptersWithLessons(courseDetail?.courseId);
-      setChapters(res);
-    }
-  };
-
-  useEffect(() => {
-    fetchChaptersDetail();
-  }, [courseDetail]);
 
   const handleAddChapter = () => {
     setEditingChapter(null);
@@ -54,6 +47,7 @@ export function useAdminChapters({ courseDetail }: adminChapterProps) {
   };
 
   const saveChapter = async () => {
+    if (!fetchChaptersDetail) return;
     if (editingChapter) {
       const res = await updateChapterAction(
         editingChapter.chapterId,
@@ -90,6 +84,7 @@ export function useAdminChapters({ courseDetail }: adminChapterProps) {
   };
 
   const deleteChapter = async () => {
+    if (!setChapters) return;
     if (!chapterToDelete) return;
     const res = await deleteChapterAction(chapterToDelete?.chapterId);
     if (!courseDetail) return;
@@ -105,13 +100,11 @@ export function useAdminChapters({ courseDetail }: adminChapterProps) {
   };
 
   return {
-    fetchChaptersDetail,
     activeChapter,
     setActiveChapter,
     handleEditChapter,
     confirmDelete,
     handleAddChapter,
-    chapters,
     openChapterModal,
     setOpenChapterModal,
     editingChapter,
