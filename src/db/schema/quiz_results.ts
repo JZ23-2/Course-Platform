@@ -15,6 +15,6 @@ export const quiz_results = pgTable("quiz_results", {
     .references(() => quizzes.quizId),
   score: integer("score").notNull(),
   passed: boolean("passed").notNull(),
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
 });
