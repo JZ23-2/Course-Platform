@@ -1,23 +1,23 @@
 import {
   createCourseAction,
   deleteCourseAction,
-  getAllCoursesAction,
   getCourseAction,
   updateCourseAction,
 } from "@/actions/admin/courses-services";
 import { createCourseInterface } from "@/interface/admin/courses/create-course-interface";
 import { GetCourseInterface } from "@/interface/admin/courses/get-course-interface";
-import { GetCourseWithCount } from "@/interface/admin/courses/get-course-with-count";
 import { adminCourseProps } from "@/props/hooks/admin-course-props";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export function useAdminCourses({ slug }: adminCourseProps = {}) {
-  const [courses, setCourses] = useState<GetCourseWithCount[]>([]);
+export function useAdminCourses({
+  slug,
+  loadCourses,
+  search,
+}: adminCourseProps = {}) {
   const [courseDetail, setCourseDetail] = useState<GetCourseInterface | null>(
     null
   );
-  const [loading, setLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingCourse, setEditingCourse] = useState<GetCourseInterface | null>(
     null
@@ -30,22 +30,9 @@ export function useAdminCourses({ slug }: adminCourseProps = {}) {
     status: "Draft",
     type: "",
   });
-  const [search, setSearch] = useState("");
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [courseToDelete, setCourseToDelete] =
     useState<GetCourseInterface | null>(null);
-
-  const loadCourses = async (q: string = "") => {
-    setLoading(true);
-    const res = await getAllCoursesAction(q);
-    setCourses(res);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    const t = setTimeout(() => loadCourses(search), 300);
-    return () => clearTimeout(t);
-  }, [search]);
 
   const openCreate = () => {
     setEditingCourse(null);
@@ -92,7 +79,7 @@ export function useAdminCourses({ slug }: adminCourseProps = {}) {
       }
     }
     setOpenDialog(false);
-    loadCourses(search);
+    if (loadCourses) loadCourses(search);
   };
 
   const confirmDelete = (course: GetCourseInterface) => {
@@ -113,7 +100,7 @@ export function useAdminCourses({ slug }: adminCourseProps = {}) {
 
     setDeleteDialog(false);
     setCourseToDelete(null);
-    loadCourses(search);
+    if (loadCourses) loadCourses(search);
   };
 
   useEffect(() => {
@@ -128,11 +115,7 @@ export function useAdminCourses({ slug }: adminCourseProps = {}) {
   }, [slug]);
 
   return {
-    search,
-    setSearch,
     openCreate,
-    loading,
-    courses,
     openEdit,
     confirmDelete,
     editingCourse,
