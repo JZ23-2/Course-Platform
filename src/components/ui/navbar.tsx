@@ -38,6 +38,15 @@ export default function Navbar() {
           Courses
         </Link>
 
+        <Link
+          href="/pricing"
+          className={`hover:text-primary transition-colors ${
+            isActive("/pricing") ? "text-primary font-semibold" : ""
+          }`}
+        >
+          Pricing
+        </Link>
+
         {role === "admin" && (
           <Link
             href="/admin/course"
@@ -94,6 +103,15 @@ export default function Navbar() {
               onClick={() => setMenuOpen(false)}
             >
               Courses
+            </Link>
+
+            <Link
+              href="/pricing"
+              className={`hover:text-primary transition-colors ${
+                isActive("/pricing") ? "text-primary font-semibold" : ""
+              }`}
+            >
+              Pricing
             </Link>
 
             {role === "admin" && (
