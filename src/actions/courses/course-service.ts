@@ -1,8 +1,8 @@
 "use server";
 import { db } from "@/db/drizzle";
-import { courses } from "@/db/schema";
+import { chapters, courses } from "@/db/schema";
 import { GetCourseWithCount } from "@/interface/admin/courses/get-course-with-count";
-import { ilike, or, sql } from "drizzle-orm";
+import { eq, ilike, or, sql } from "drizzle-orm";
 
 export async function getAllCoursesAction(
   search?: string
@@ -27,13 +27,12 @@ export async function getAllCoursesAction(
         sortOrder: courses.sortOrder,
         createdAt: courses.createdAt,
         updatedAt: courses.updatedAt,
-        chapterCount: sql<number>`
-          (SELECT COUNT(*) FROM chapters 
-            WHERE chapters."courseId" = ${courses.courseId})
-        `,
+        chapterCount: sql<number>`COUNT(chapters."chapterId")`,
       })
       .from(courses)
+      .leftJoin(chapters, eq(chapters.courseId, courses.courseId))
       .where(whereClause as any)
+      .groupBy(courses.courseId)
       .orderBy(courses.sortOrder);
 
     return data;
