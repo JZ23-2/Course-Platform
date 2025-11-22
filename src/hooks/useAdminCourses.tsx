@@ -1,13 +1,12 @@
 import {
   createCourseAction,
   deleteCourseAction,
-  getCourseAction,
   updateCourseAction,
 } from "@/actions/admin/courses-services";
 import { createCourseInterface } from "@/interface/admin/courses/create-course-interface";
 import { GetCourseInterface } from "@/interface/admin/courses/get-course-interface";
 import { adminCourseProps } from "@/props/hooks/admin-course-props";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 export function useAdminCourses({
@@ -15,9 +14,6 @@ export function useAdminCourses({
   loadCourses,
   search,
 }: adminCourseProps = {}) {
-  const [courseDetail, setCourseDetail] = useState<GetCourseInterface | null>(
-    null
-  );
   const [openDialog, setOpenDialog] = useState(false);
   const [editingCourse, setEditingCourse] = useState<GetCourseInterface | null>(
     null
@@ -103,17 +99,6 @@ export function useAdminCourses({
     if (loadCourses) loadCourses(search);
   };
 
-  useEffect(() => {
-    const getCourseDetail = async () => {
-      if (!slug) return;
-      const res = await getCourseAction(slug);
-
-      setCourseDetail(res);
-    };
-
-    getCourseDetail();
-  }, [slug]);
-
   return {
     openCreate,
     openEdit,
@@ -128,6 +113,5 @@ export function useAdminCourses({
     setDeleteDialog,
     courseToDelete,
     handleDeleteConfirmed,
-    courseDetail,
   };
 }
