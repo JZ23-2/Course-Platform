@@ -13,7 +13,6 @@ import {
 import { Plus, Edit, Trash } from "lucide-react";
 import DeleteModal from "@/components/ui/delete-modal";
 import { useAdminChapters } from "@/hooks/useAdminChapters";
-import { useAdminCourses } from "@/hooks/useAdminCourses";
 import { useAdminLesson } from "@/hooks/useAdminLesson";
 import { LessonModal } from "@/components/ui/lessons/LessonModal";
 import { ChapterModal } from "@/components/ui/chapters/ChapterModal";
@@ -50,7 +49,6 @@ export default function CourseDetailPage({
     chapterToDelete,
   } = useAdminChapters({
     courseDetail,
-    chapters,
     fetchChaptersDetail,
     setChapters,
   });
