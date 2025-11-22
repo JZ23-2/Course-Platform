@@ -1,9 +1,15 @@
+import { getCourseAction } from "@/actions/admin/courses-services";
 import { getAllCoursesAction } from "@/actions/courses/course-service";
+import { GetCourseInterface } from "@/interface/admin/courses/get-course-interface";
 import { GetCourseWithCount } from "@/interface/admin/courses/get-course-with-count";
+import { courseProps } from "@/props/hooks/course-props";
 import { useEffect, useState } from "react";
 
-export function useCourses() {
+export function useCourses({ slug }: courseProps = {}) {
   const [courses, setCourses] = useState<GetCourseWithCount[]>([]);
+  const [courseDetail, setCourseDetail] = useState<GetCourseInterface | null>(
+    null
+  );
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -19,5 +25,16 @@ export function useCourses() {
     return () => clearTimeout(t);
   }, [search]);
 
-  return { courses, setSearch, search, loading, loadCourses };
+  const getCourseDetail = async () => {
+    if (!slug) return;
+    const res = await getCourseAction(slug);
+
+    setCourseDetail(res);
+  };
+
+  useEffect(() => {
+    getCourseDetail();
+  }, [slug]);
+
+  return { courses, setSearch, search, loading, loadCourses, courseDetail };
 }
