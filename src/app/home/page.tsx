@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/ui/navbar";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -9,10 +9,31 @@ import { Badge } from "@/components/ui/badge";
 import { Eye, Lock, Search as SearchIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCourses } from "@/hooks/useCourses";
+import { getUserSubscription } from "@/actions/subscriptions/subscriptions-service";
+import { useSession } from "next-auth/react";
 
 export default function HomePage() {
   const router = useRouter();
   const { courses, search, setSearch, loading } = useCourses();
+  const { data: session } = useSession();
+
+  const [hasSubscription, setHasSubscription] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    async function check() {
+      const ok = await getUserSubscription(session?.user.id || "");
+      setHasSubscription(ok);
+    }
+    check();
+  }, [session]);
+
+  if (hasSubscription === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Checking subscription...
+      </div>
+    );
+  }
 
   const visibleCourses = courses.filter((course) => course.type !== "Draft");
 
@@ -27,8 +48,8 @@ export default function HomePage() {
               Explore Courses
             </h1>
             <p className="text-muted-foreground mt-1">
-              Browse all available courses. Paid courses are locked until you
-              purchase them.
+              Browse all available courses. Paid courses unlock if you have a
+              subscription.
             </p>
           </div>
 
@@ -53,74 +74,78 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {visibleCourses.map((course) => (
-              <motion.div
-                key={course.courseId}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.25 }}
-              >
-                <Card className="overflow-hidden shadow-lg hover:shadow-2xl transition-shadow relative">
-                  <div className="relative h-44 bg-muted/30 flex items-center justify-center">
-                    {course.thumbnail ? (
-                      <img
-                        src={course.thumbnail}
-                        alt={course.title}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="p-6 text-center">
-                        <div className="text-lg font-semibold">
-                          {course.title}
+            {visibleCourses.map((course) => {
+              const isPaid = course.type === "Paid";
+              const locked = isPaid && !hasSubscription;
+
+              return (
+                <motion.div
+                  key={course.courseId}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <Card className="overflow-hidden shadow-lg hover:shadow-2xl transition-shadow relative">
+                    <div className="relative h-44 bg-muted/30 flex items-center justify-center">
+                      {course.thumbnail ? (
+                        <img
+                          src={course.thumbnail}
+                          alt={course.title}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="p-6 text-center">
+                          <div className="text-lg font-semibold">
+                            {course.title}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            No thumbnail
+                          </div>
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          No thumbnail
+                      )}
+
+                      {locked && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-xl font-bold">
+                          <Lock className="mr-2" /> Locked
                         </div>
-                      </div>
-                    )}
-
-                    {course.type === "Paid" && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-xl font-bold">
-                        <Lock className="mr-2" /> Locked
-                      </div>
-                    )}
-                  </div>
-
-                  <CardContent>
-                    <h3 className="text-lg font-semibold">{course.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-2 line-clamp-3">
-                      {course.description}
-                    </p>
-
-                    <div className="flex items-center gap-2 mt-3">
-                      <Badge>{course.status}</Badge>
-                      <Badge>{course.type}</Badge>
-                      <span className="text-xs text-muted-foreground ml-auto">
-                        {course.chapterCount} Chapters
-                      </span>
+                      )}
                     </div>
-                  </CardContent>
 
-                  <CardFooter>
-                    <button
-                      className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md font-semibold transition ${
-                        course.type === "Paid"
-                          ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
-                      disabled={course.type === "Paid"}
-                      onClick={() =>
-                        course.type !== "Paid" &&
-                        router.push(`/home/${course.slug}`)
-                      }
-                    >
-                      <Eye size={16} />
-                      {course.type === "Paid" ? "Locked" : "View Course"}
-                    </button>
-                  </CardFooter>
-                </Card>
-              </motion.div>
-            ))}
+                    <CardContent>
+                      <h3 className="text-lg font-semibold">{course.title}</h3>
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-3">
+                        {course.description}
+                      </p>
+
+                      <div className="flex items-center gap-2 mt-3">
+                        <Badge>{course.status}</Badge>
+                        <Badge>{course.type}</Badge>
+                        <span className="text-xs text-muted-foreground ml-auto">
+                          {course.chapterCount} Chapters
+                        </span>
+                      </div>
+                    </CardContent>
+
+                    <CardFooter>
+                      <button
+                        className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md font-semibold transition ${
+                          locked
+                            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
+                        }`}
+                        disabled={locked}
+                        onClick={() =>
+                          !locked && router.push(`/home/${course.slug}`)
+                        }
+                      >
+                        <Eye size={16} />
+                        {locked ? "Locked" : "View Course"}
+                      </button>
+                    </CardFooter>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </main>
