@@ -1,4 +1,4 @@
-import { QuizOption } from "./get-quiz-with-count";
+import { QuizOption } from "./quiz-option-interface";
 
 export interface QuizQuestionEdit {
   quizQuestionId: string;
