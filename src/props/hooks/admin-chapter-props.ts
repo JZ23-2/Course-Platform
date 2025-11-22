@@ -4,7 +4,6 @@ import { Dispatch, SetStateAction } from "react";
 
 export interface adminChapterProps {
   courseDetail?: GetCourseInterface | null;
-  chapters?: getChapterInterface[];
   setChapters?: Dispatch<SetStateAction<getChapterInterface[]>>;
   fetchChaptersDetail?: () => Promise<void>;
 }
