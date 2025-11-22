@@ -6,7 +6,7 @@ export default withAuth(
     const { pathname } = req.nextUrl;
     const token = req.nextauth.token;
 
-    const protectedRoutes = ["/home", "/admin"];
+    const protectedRoutes = ["/home", "/admin", "/pricing"];
     if (!token && protectedRoutes.some((p) => pathname.startsWith(p))) {
       return NextResponse.redirect(new URL("/", req.url));
     }
@@ -32,5 +32,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/home", "/admin/:path*", "/", "/register"],
+  matcher: ["/home", "/pricing", "/admin/:path*", "/", "/register"],
 };
