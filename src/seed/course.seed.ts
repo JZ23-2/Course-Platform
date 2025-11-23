@@ -1,6 +1,5 @@
 import { db } from "@/db/drizzle";
 import { courses } from "@/db/schema";
-import { nanoid } from "nanoid";
 
 export async function seedCourses() {
   await db.insert(courses).values([
@@ -28,7 +27,7 @@ export async function seedCourses() {
     },
     {
       courseId: "course789",
-      title: "Introduction to Databases",
+      title: "Introduction to DB",
       description: "Understand relational databases and basic queries.",
       thumbnail:
         "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
