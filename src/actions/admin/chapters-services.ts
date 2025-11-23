@@ -1,10 +1,8 @@
 "use server";
 import { db } from "@/db/drizzle";
-import { chapters, lessons } from "@/db/schema";
+import { chapters } from "@/db/schema";
 import { actionResposneInterface } from "@/interface/action/action-response-interface";
-import { ChapterInterface } from "@/interface/admin/chapters/chapter-interface";
 import { createChapterInterface } from "@/interface/admin/chapters/create-chapter-interface";
-import { getChapterInterface } from "@/interface/admin/chapters/get-chapter-interface";
 import { updateChapterInterface } from "@/interface/admin/chapters/update-chapter-interface";
 import { updateCourseInterface } from "@/interface/admin/courses/update-course-interface";
 import { eq } from "drizzle-orm";
