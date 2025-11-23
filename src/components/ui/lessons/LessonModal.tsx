@@ -130,7 +130,7 @@ export function LessonModal({
                   setLessonForm({ ...lessonForm, quizId: e.target.value })
                 }
               >
-                <option value="">-- Select a Quiz --</option>
+                <option value="">Select a Quiz</option>
                 {quizzes.map((quiz) => (
                   <option key={quiz.quizId} value={quiz.quizId}>
                     {quiz.title}
