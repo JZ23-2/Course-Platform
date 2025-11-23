@@ -27,6 +27,7 @@ export function useAdminLesson({
     description: "",
     content: "",
     sortOrder: 0,
+    quizId: "",
   });
 
   const [deleteLessonsDialog, setDeleteLessonDialog] = useState(false);
@@ -49,6 +50,7 @@ export function useAdminLesson({
       description: "",
       content: "",
       sortOrder: 0,
+      quizId: "",
     });
     setOpenLessonModal(true);
   };
@@ -62,6 +64,7 @@ export function useAdminLesson({
       description: lesson.description || "",
       content: lesson.content || "",
       sortOrder: lesson.sortOrder || 0,
+      quizId: lesson.quizId || "",
     });
     setOpenLessonModal(true);
   };
