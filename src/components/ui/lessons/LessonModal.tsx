@@ -1,3 +1,4 @@
+"use client";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +10,9 @@ import { Button } from "../button";
 import { Textarea } from "../textarea";
 import { Input } from "../input";
 import { modalProps } from "@/props/lessons/modal-props";
+import { getQuizInterface } from "@/interface/quiz/get-quiz-interface";
+import { useEffect, useState } from "react";
+import { getQuizAction } from "@/actions/quiz/quiz-service";
 
 export function LessonModal({
   editingLesson,
@@ -18,6 +22,13 @@ export function LessonModal({
   setOpenLessonModal,
   setLessonForm,
 }: modalProps) {
+  const [quizzes, setQuizzes] = useState<getQuizInterface[]>([]);
+  useEffect(() => {
+    if (openLessonModal && lessonForm.type === "quiz") {
+      getQuizAction().then(setQuizzes);
+    }
+  }, [openLessonModal, lessonForm.type]);
+
   return (
     <Dialog open={openLessonModal} onOpenChange={setOpenLessonModal}>
       <DialogContent>
@@ -70,6 +81,7 @@ export function LessonModal({
             >
               <option value="video">Video</option>
               <option value="article">Article</option>
+              <option value="quiz">Quiz</option>
             </select>
           </div>
 
@@ -102,6 +114,29 @@ export function LessonModal({
                   setLessonForm({ ...lessonForm, content: e.target.value })
                 }
               />
+            </div>
+          )}
+
+          {lessonForm.type === "quiz" && (
+            <div className="space-y-1">
+              <label htmlFor="quizId" className="text-sm font-medium">
+                Select Quiz
+              </label>
+              <select
+                id="quizId"
+                className="border rounded-md px-3 py-2 w-full"
+                value={lessonForm.quizId || ""}
+                onChange={(e) =>
+                  setLessonForm({ ...lessonForm, quizId: e.target.value })
+                }
+              >
+                <option value="">-- Select a Quiz --</option>
+                {quizzes.map((quiz) => (
+                  <option key={quiz.quizId} value={quiz.quizId}>
+                    {quiz.title}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
 
