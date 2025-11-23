@@ -48,14 +48,31 @@ export default function Navbar() {
         </Link>
 
         {role === "admin" && (
-          <Link
-            href="/admin/course"
-            className={`hover:text-primary transition-colors ${
-              isActive("/admin/course") ? "text-primary font-semibold" : ""
-            }`}
-          >
-            Admin
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="px-3 py-1 rounded">
+                Admin
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem>
+                <Link
+                  href="/admin/course"
+                  className={isActive("/admin/course") ? "font-semibold" : ""}
+                >
+                  Course
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link
+                  href="/admin/quiz"
+                  className={isActive("/admin/quiz") ? "font-semibold" : ""}
+                >
+                  Quiz
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         <div className="flex items-center gap-2">
@@ -83,6 +100,7 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* Mobile Menu */}
       <div className="md:hidden flex items-center gap-2">
         <ThemeToggle />
         <Button
@@ -107,23 +125,35 @@ export default function Navbar() {
 
             <Link
               href="/pricing"
-              className={`hover:text-primary transition-colors ${
-                isActive("/pricing") ? "text-primary font-semibold" : ""
+              className={`px-4 py-2 hover:bg-muted/20 transition-colors ${
+                isActive("/pricing") ? "bg-muted/20 font-semibold" : ""
               }`}
+              onClick={() => setMenuOpen(false)}
             >
               Pricing
             </Link>
 
             {role === "admin" && (
-              <Link
-                href="/admin/course"
-                className={`px-4 py-2 hover:bg-muted/20 transition-colors ${
-                  isActive("/admin/course") ? "bg-muted/20 font-semibold" : ""
-                }`}
-                onClick={() => setMenuOpen(false)}
-              >
-                Admin
-              </Link>
+              <>
+                <Link
+                  href="/admin/course"
+                  className={`px-4 py-2 hover:bg-muted/20 transition-colors ${
+                    isActive("/admin/course") ? "bg-muted/20 font-semibold" : ""
+                  }`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Course
+                </Link>
+                <Link
+                  href="/admin/quiz"
+                  className={`px-4 py-2 hover:bg-muted/20 transition-colors ${
+                    isActive("/admin/quiz") ? "bg-muted/20 font-semibold" : ""
+                  }`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Quiz
+                </Link>
+              </>
             )}
 
             <Link
