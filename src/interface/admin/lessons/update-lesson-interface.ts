@@ -9,4 +9,5 @@ export interface updateLessonsInterface {
   sortOrder?: number;
   createdAt?: Date;
   updatedAt?: Date;
+  quizId?: string;
 }
