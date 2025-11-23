@@ -26,7 +26,7 @@ export async function createLessonsAction(
         description: data.description,
         videoUrl: data.videoUrl,
       });
-    } else {
+    } else if (data.type === "article") {
       await db.insert(lessons).values({
         lessonId: lessonId,
         chapterId: chapterId,
@@ -34,6 +34,15 @@ export async function createLessonsAction(
         type: data.type,
         description: data.description,
         content: data.content,
+      });
+    } else {
+      await db.insert(lessons).values({
+        lessonId: lessonId,
+        chapterId: chapterId,
+        title: data.title,
+        type: data.type,
+        description: data.description,
+        quizId: data.quizId,
       });
     }
 
@@ -61,10 +70,14 @@ export async function updateLessonsAction(
     if (data.type !== undefined) {
       if (data.type === "video") {
         if (data.videoUrl !== undefined) updates.videoUrl = data.videoUrl;
-      } else {
+      } else if (data.type === "article") {
         if (data.content !== undefined) updates.content = data.content;
+      } else {
+        if (data.quizId !== undefined) updates.quizId = data.quizId;
       }
     }
+
+    updates.type = data.type;
 
     await db.update(lessons).set(updates).where(eq(lessons.lessonId, lessonId));
 
