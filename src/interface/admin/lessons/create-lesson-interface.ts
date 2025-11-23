@@ -5,4 +5,5 @@ export interface createLessonsInterface {
   description: string;
   content?: string;
   sortOrder: number;
+  quizId?: string;
 }
