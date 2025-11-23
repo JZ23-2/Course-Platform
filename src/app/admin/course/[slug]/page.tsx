@@ -97,9 +97,11 @@ export default function CourseDetailPage({
                 <p className="text-muted-foreground">
                   {courseDetail.description}
                 </p>
+
                 <img
                   src={courseDetail.thumbnail || ""}
-                  className="rounded-lg shadow-md w-full"
+                  alt={courseDetail.title || ""}
+                  className="h-[300px] w-[500px] object-cover"
                 />
               </CardContent>
             </Card>
