@@ -82,6 +82,11 @@ The platform aims to support scalable online education by giving administrators 
      pnpm run dev
      ```
 
+7. **For the easy setup (Optional)**
+   - ```bash
+     docker compose up -d --build
+      ```
+
 ## Known Limitations or Issues
 
 - Setting up the payment gateway requires identity verification (ID submission), which can delay implementation.
