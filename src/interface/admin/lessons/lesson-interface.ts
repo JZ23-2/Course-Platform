@@ -9,4 +9,5 @@ export interface LessonInterface {
   sortOrder: number | null;
   createdAt: Date | null;
   updatedAt: Date | null;
+  quizId: string | null;
 }
