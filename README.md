@@ -78,6 +78,7 @@ The platform aims to support scalable online education by giving administrators 
      ```
 
 6. **Start the Development Server**
+
    - ```bash
      pnpm run dev
      ```
@@ -85,7 +86,54 @@ The platform aims to support scalable online education by giving administrators 
 7. **For the easy setup (Optional)**
    - ```bash
      docker compose up -d --build
-      ```
+     ```
+
+## Page Preview (User)
+
+1. **Login Page**
+   ![Login Page](./markdown-asset/login.png)
+
+2. **Register Page**
+   ![Register Page](./markdown-asset/register.png)
+
+3. **Home Page(Free Plan)**
+   ![Home Page Free Plan](./markdown-asset/home-page-free.png)
+
+4. **Home Page(Paid Plan)**
+   ![Home Page Paid Plan](./markdown-asset/home-page-paid.png)
+
+5. **Access Course Detail with Video Lesson**
+   ![User Course Detail Video](./markdown-asset/user-course-detail-video.png)
+
+6. **Access Course Detail with Article Lesson**
+   ![User Course Detail Article](./markdown-asset/user-course-detail-article.png)
+
+7. **Access Course Detail with Quiz Lesson**
+   ![User Course Quiz Video](./markdown-asset/user-course-detail-quiz.png)
+
+8. **View Profile & Update Profile Page**
+   ![Profile](./markdown-asset/profile.png)
+
+9. **Do Quiz Assignments**
+   ![Quiz Assignment](./markdown-asset/quiz-assigment.png)
+
+## Page Preview (Admin)
+
+1. Course Admin Page
+   ![Course Admin](./markdown-asset/course-admin.png)
+
+2. Course Detail Admin Page
+   ![Course Detail Admin](./markdown-asset/course-detail-admin.png)
+
+3. Quiz Admin Page
+   ![Quiz Admin](./markdown-asset/quiz-admin-page.png)
+
+4. Question Admin View
+   ![Question Admin](./markdown-asset/question-admin-view.png)
+
+5. Option Admin View
+   ![Option Admin](./markdown-asset/options-admin.png)
+
 
 ## Known Limitations or Issues
 
