@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import { db } from "@/db/drizzle";
 import { chapters, lessons } from "@/db/schema";
 import { ChapterInterface } from "@/interface/admin/chapters/chapter-interface";
@@ -26,6 +26,7 @@ export async function getChaptersWithLessons(
       lessonSortOrder: lessons.sortOrder,
       lessonCreatedAt: lessons.createdAt,
       lessonUpdatedAt: lessons.updatedAt,
+      lessonQuizId: lessons.quizId,
     })
     .from(chapters)
     .leftJoin(lessons, eq(chapters.chapterId, lessons.chapterId))
@@ -58,6 +59,7 @@ export async function getChaptersWithLessons(
         sortOrder: row.lessonSortOrder,
         createdAt: row.lessonCreatedAt,
         updatedAt: row.lessonUpdatedAt,
+        quizId: row.lessonQuizId,
       });
     }
   });
