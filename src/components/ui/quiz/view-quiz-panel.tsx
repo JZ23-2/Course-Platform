@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "../button";
 import { ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import { viewQuizPanelProps } from "@/props/quiz/view-quiz-panel-props";
