@@ -4,6 +4,7 @@ import { quiz_options, quiz_questions, quizzes } from "@/db/schema";
 import { GetQuizWithCount } from "@/interface/admin/quiz/get-quiz-with-count";
 import { QuizOption } from "@/interface/admin/quiz/quiz-option-interface";
 import { QuizQuestion } from "@/interface/admin/quiz/quiz-question-interface";
+import { getQuizInterface } from "@/interface/quiz/get-quiz-interface";
 import { eq } from "drizzle-orm";
 
 export async function getQuizWithQuestionCount(): Promise<GetQuizWithCount[]> {
@@ -49,4 +50,20 @@ export async function getQuizWithQuestionCount(): Promise<GetQuizWithCount[]> {
   );
 
   return quizList;
+}
+
+export async function getQuizAction(): Promise<getQuizInterface[]> {
+  const result = await db
+    .select({
+      quizId: quizzes.quizId,
+      title: quizzes.title,
+    })
+    .from(quizzes);
+
+  const res: getQuizInterface[] = result.map((r) => ({
+    quizId: r.quizId,
+    title: r.title,
+  }));
+
+  return res;
 }
