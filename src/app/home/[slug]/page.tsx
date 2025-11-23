@@ -16,6 +16,7 @@ import { getUserSubscription } from "@/actions/subscriptions/subscriptions-servi
 import { useSession } from "next-auth/react";
 import { UnauthorizedModal } from "@/components/ui/unauthorized-modal";
 import QuizStartModal from "@/components/ui/quiz/quiz-start-modal";
+import Image from "next/image";
 
 export default function CourseDetailPage({
   params,
@@ -72,8 +73,9 @@ export default function CourseDetailPage({
                 </p>
                 {courseDetail.thumbnail && (
                   <img
-                    src={courseDetail.thumbnail}
-                    className="rounded-lg shadow-md w-full"
+                    src={courseDetail.thumbnail || ""}
+                    alt={courseDetail.title}
+                    className="h-[300px] w-[500px] object-cover"
                   />
                 )}
               </CardContent>
