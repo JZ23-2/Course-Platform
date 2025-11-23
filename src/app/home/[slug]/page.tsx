@@ -1,6 +1,6 @@
 "use client";
-import React, { use } from "react";
-import { useEffect, useState } from "react";
+import React, { use, useState } from "react";
+import { useEffect } from "react";
 import Navbar from "@/components/ui/navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,7 @@ import { useCourses } from "@/hooks/useCourses";
 import { getUserSubscription } from "@/actions/subscriptions/subscriptions-service";
 import { useSession } from "next-auth/react";
 import { UnauthorizedModal } from "@/components/ui/unauthorized-modal";
+import QuizStartModal from "@/components/ui/quiz/quiz-start-modal";
 
 export default function CourseDetailPage({
   params,
@@ -26,6 +27,9 @@ export default function CourseDetailPage({
   const { courseDetail } = useCourses({ slug });
   const { chapters } = useChapters({ courseDetail });
   const [allowed, setAllowed] = useState<boolean | null>(null);
+
+  const [quizModalOpen, setQuizModalOpen] = useState(false);
+  const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
 
   useEffect(() => {
     async function check() {
@@ -44,16 +48,8 @@ export default function CourseDetailPage({
   }, [courseDetail, session]);
 
   if (!courseDetail) return <div>Loading...</div>;
-
   if (allowed === null) return <div>Checking subscription...</div>;
-
-  if (!allowed) {
-    return <UnauthorizedModal />;
-  }
-
-  if (!courseDetail) return <div>Loading...</div>;
-
-  const courseChapters = chapters;
+  if (!allowed) return <UnauthorizedModal />;
 
   return (
     <div className="min-h-screen bg-background">
@@ -89,13 +85,13 @@ export default function CourseDetailPage({
 
             <Card className="h-full">
               <CardContent className="p-4">
-                {courseChapters.length === 0 ? (
+                {chapters.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">
                     No chapters available.
                   </p>
                 ) : (
                   <Accordion type="single" collapsible className="space-y-3">
-                    {courseChapters.map((chapter) => (
+                    {chapters.map((chapter) => (
                       <AccordionItem
                         key={chapter.chapterId}
                         value={chapter.chapterId}
@@ -125,14 +121,31 @@ export default function CourseDetailPage({
                                 key={lesson.lessonId}
                                 className="p-4 rounded-xl border bg-muted/50 backdrop-blur-sm shadow-sm flex flex-col gap-3"
                               >
-                                <span className="font-medium text-base">
-                                  {lesson.title}
-                                </span>
+                                <div className="flex justify-between items-center">
+                                  <span className="font-medium text-base">
+                                    {lesson.title}
+                                  </span>
+                                  {lesson.type === "quiz" && (
+                                    <button
+                                      className="text-white bg-blue-600 dark:bg-blue-500 px-3 py-1 rounded-md text-sm hover:bg-blue-700 dark:hover:bg-blue-600"
+                                      onClick={() => {
+                                        setSelectedQuizId(
+                                          lesson.quizId || null
+                                        );
+                                        setQuizModalOpen(true);
+                                      }}
+                                    >
+                                      Start Quiz
+                                    </button>
+                                  )}
+                                </div>
+
                                 {lesson.description && (
                                   <p className="text-sm text-muted-foreground leading-relaxed">
                                     {lesson.description}
                                   </p>
                                 )}
+
                                 {lesson.type === "video" && lesson.videoUrl && (
                                   <video
                                     controls
@@ -140,9 +153,15 @@ export default function CourseDetailPage({
                                     className="w-full rounded-lg shadow-md"
                                   />
                                 )}
+
                                 {lesson.type === "article" &&
                                   lesson.content && (
-                                    <div className="prose prose-neutral max-w-full" />
+                                    <div
+                                      className="prose prose-neutral max-w-full"
+                                      dangerouslySetInnerHTML={{
+                                        __html: lesson.content,
+                                      }}
+                                    />
                                   )}
                               </div>
                             ))
@@ -157,6 +176,12 @@ export default function CourseDetailPage({
           </div>
         </div>
       </div>
+
+      <QuizStartModal
+        open={quizModalOpen}
+        quizId={selectedQuizId}
+        onClose={() => setQuizModalOpen(false)}
+      />
     </div>
   );
 }
