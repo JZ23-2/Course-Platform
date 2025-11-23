@@ -1,5 +1,5 @@
 "use client";
-import React, { use } from "react";
+import React, { use, useState } from "react";
 import Navbar from "@/components/ui/navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { LessonModal } from "@/components/ui/lessons/LessonModal";
 import { ChapterModal } from "@/components/ui/chapters/ChapterModal";
 import { useCourses } from "@/hooks/useCourses";
 import { useChapters } from "@/hooks/useChapters";
+import QuizStartModal from "@/components/ui/quiz/quiz-start-modal";
 
 export default function CourseDetailPage({
   params,
@@ -74,6 +75,8 @@ export default function CourseDetailPage({
     setActiveChapter,
   });
 
+  const [quizModalOpen, setQuizModalOpen] = useState(false);
+  const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
   if (!courseDetail) return <div>Loading...</div>;
   return (
     <div className="min-h-screen bg-background">
@@ -166,13 +169,6 @@ export default function CourseDetailPage({
                               <Plus size={14} className="mr-1" /> Add Lesson
                             </Button>
                           </div>
-
-                          {(chapter.lessons?.length ?? 0) === 0 && (
-                            <p className="text-sm text-muted-foreground">
-                              No lessons in this chapter.
-                            </p>
-                          )}
-
                           {(chapter.lessons || []).map((lesson) => (
                             <div
                               key={lesson.lessonId}
@@ -180,9 +176,26 @@ export default function CourseDetailPage({
                             >
                               <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-2">
-                                  <span className="font-medium text-base">
+                                  <span
+                                    className={`font-medium text-base ${
+                                      lesson.type === "quiz"
+                                        ? "cursor-pointer underline text-blue-500 dark:text-blue-400"
+                                        : ""
+                                    }`}
+                                    onClick={() => {
+                                      if (lesson.type === "quiz") {
+                                        setSelectedQuizId(
+                                          lesson.quizId || null
+                                        );
+                                        setQuizModalOpen(true);
+                                      }
+                                    }}
+                                  >
                                     {lesson.title}
                                   </span>
+                                  {lesson.type === "quiz" && (
+                                    <Badge variant="secondary">Quiz</Badge>
+                                  )}
                                 </div>
 
                                 <div className="flex gap-2">
@@ -228,6 +241,19 @@ export default function CourseDetailPage({
                                   }}
                                 />
                               )}
+
+                              {lesson.type === "quiz" && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setSelectedQuizId(lesson.quizId || null);
+                                    setQuizModalOpen(true);
+                                  }}
+                                >
+                                  Start Quiz
+                                </Button>
+                              )}
                             </div>
                           ))}
                         </AccordionContent>
@@ -240,6 +266,12 @@ export default function CourseDetailPage({
           </div>
         </div>
       </div>
+
+      <QuizStartModal
+        open={quizModalOpen}
+        quizId={selectedQuizId}
+        onClose={() => setQuizModalOpen(false)}
+      />
 
       <ChapterModal
         chapterForm={chapterForm}
