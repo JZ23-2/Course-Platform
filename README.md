@@ -67,7 +67,6 @@ The platform aims to support scalable online education by giving administrators 
 4. **Database Migration**
 
    - ```bash
-     pnpm drizzle-kit migrate
      pnom drizzle-kit push
      ```
 
